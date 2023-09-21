@@ -51,11 +51,10 @@ func main() {
 		StartInSearchMode: true,
 		Stdout:            &bellSkipper{},
 	}
-
 	_, result, err := prompt.Run()
 
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
+		checkError(err)
 		return
 	}
 	fmt.Printf(PromptColor, "Choose a config")
@@ -97,6 +96,17 @@ func getConfigs(configFileLocation string) []string {
 	files = append(files, "default")
 	sort.Strings(files)
 	return files
+}
+
+func checkError(err error) {
+	if err.Error() == "^D" {
+		// https://github.com/manifoldco/promptui/issues/179
+		log.Fatalf("<Del> not supported")
+	} else if err.Error() == "^C" {
+		os.Exit(1)
+	} else {
+		log.Fatal(err)
+	}
 }
 
 type bellSkipper struct{}
