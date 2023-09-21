@@ -70,3 +70,5 @@ function kxd_config {
 ```sh
 PROMPT='OTHER_PROMPT_STUFF $(kxd_info)'
 ```
+
+Looking for a naming convention besides `.conf`.  You can set an environment variable that lets you specify a string matcher.  For example, lets say your files all end in `-config`.  You'd set `KXD_MATCHER="-config"`

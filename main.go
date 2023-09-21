@@ -79,7 +79,8 @@ func getConfigs(configFileLocation string) []string {
 	var files []string
 	filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
 		if !f.IsDir() {
-			if filepath.Ext(path) == ".conf" {
+			if filepath.Ext(path) == ".conf" ||
+				(os.Getenv("KXD_MATCHER") != "" && strings.Contains(f.Name(), os.Getenv("KXD_MATCHER"))) {
 				files = append(files, f.Name())
 			}
 		}
