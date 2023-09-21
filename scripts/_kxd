@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [[ "$1" == "version" ]]; then
+  _kxd_prompt version
+  return
+fi
+
+KUBECONFIG="$KUBECONFIG" _kxd_prompt
+
+selected_config="$HOME/.kube/$(cat ~/.kxd)"
+
+if [ -z "$selected_config" ]
+then
+  unset KUBECONFIG
+else
+  export KUBECONFIG="$selected_config"
+fi
