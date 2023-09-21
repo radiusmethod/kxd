@@ -33,6 +33,7 @@ func main() {
 	home := os.Getenv("HOME")
 	configFileLocation := fmt.Sprintf("%s/.kube", home)
 	configs := getConfigs(configFileLocation)
+	touchFile(fmt.Sprintf("%s/.kxd", home))
 
 	fmt.Printf(NoticeColor, "Kubeconfig Switcher\n")
 	prompt := promptui.Select{
@@ -62,6 +63,14 @@ func main() {
 	fmt.Printf(CyanColor, result)
 	fmt.Println("")
 	writeFile(result, home)
+}
+
+func touchFile(name string) error {
+	file, err := os.OpenFile(name, os.O_RDONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }
 
 func writeFile(profile, loc string) {
