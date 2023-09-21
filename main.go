@@ -85,9 +85,10 @@ func writeFile(profile, loc string) {
 
 func getConfigs(configFileLocation string) []string {
 	var files []string
+	fileExt := getenv("KXD_MATCHER", ".conf")
 	filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
 		if !f.IsDir() {
-			if filepath.Ext(path) == ".conf" {
+			if strings.Contains(f.Name(), fileExt) {
 				files = append(files, f.Name())
 			}
 		}
@@ -96,6 +97,14 @@ func getConfigs(configFileLocation string) []string {
 	files = append(files, "default")
 	sort.Strings(files)
 	return files
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
 }
 
 func checkError(err error) {
