@@ -51,11 +51,10 @@ func main() {
 		StartInSearchMode: true,
 		Stdout:            &bellSkipper{},
 	}
-
 	_, result, err := prompt.Run()
 
 	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
+		checkError(err)
 		return
 	}
 	fmt.Printf(PromptColor, "Choose a config")
@@ -86,9 +85,10 @@ func writeFile(profile, loc string) {
 
 func getConfigs(configFileLocation string) []string {
 	var files []string
+	fileExt := getenv("KXD_MATCHER", ".conf")
 	filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
 		if !f.IsDir() {
-			if filepath.Ext(path) == ".conf" {
+			if strings.Contains(f.Name(), fileExt) {
 				files = append(files, f.Name())
 			}
 		}
@@ -97,6 +97,25 @@ func getConfigs(configFileLocation string) []string {
 	files = append(files, "default")
 	sort.Strings(files)
 	return files
+}
+
+func getenv(key, fallback string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		return fallback
+	}
+	return value
+}
+
+func checkError(err error) {
+	if err.Error() == "^D" {
+		// https://github.com/manifoldco/promptui/issues/179
+		log.Fatalf("<Del> not supported")
+	} else if err.Error() == "^C" {
+		os.Exit(1)
+	} else {
+		log.Fatal(err)
+	}
 }
 
 type bellSkipper struct{}
