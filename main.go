@@ -72,10 +72,10 @@ func touchFile(name string) error {
 	return file.Close()
 }
 
-func writeFile(profile, loc string) {
+func writeFile(config, loc string) {
 	s := []byte("")
-	if profile != "default" {
-		s = []byte(profile)
+	if config != "unset" {
+		s = []byte(config)
 	}
 	err := os.WriteFile(fmt.Sprintf("%s/.kxd", loc), s, 0644)
 	if err != nil {
@@ -94,7 +94,7 @@ func getConfigs(configFileLocation string) []string {
 		}
 		return nil
 	})
-	files = append(files, "default")
+	files = append(files, "unset")
 	sort.Strings(files)
 	return files
 }
