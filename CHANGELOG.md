@@ -1,2 +1,5 @@
-## 0.0.1 (September 21, 2023)
+## v0.0.2 (September 22, 2023)
+* Added `KXD_MATCHER` environment variable for specifying different config matchers.
+
+## v0.0.1 (September 21, 2023)
 * Initial Release

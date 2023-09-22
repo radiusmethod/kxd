@@ -17,7 +17,7 @@ const (
 	CyanColor   = "\033[0;36m%s\033[0m"
 )
 
-var version string = "v0.0.1"
+var version string = "v0.0.2"
 
 func newPromptUISearcher(items []string) list.Searcher {
 	return func(searchInput string, itemIndex int) bool {
@@ -33,7 +33,10 @@ func main() {
 	home := os.Getenv("HOME")
 	configFileLocation := fmt.Sprintf("%s/.kube", home)
 	configs := getConfigs(configFileLocation)
-	touchFile(fmt.Sprintf("%s/.kxd", home))
+	err := touchFile(fmt.Sprintf("%s/.kxd", home))
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf(NoticeColor, "Kubeconfig Switcher\n")
 	prompt := promptui.Select{
@@ -86,7 +89,7 @@ func writeFile(config, loc string) {
 func getConfigs(configFileLocation string) []string {
 	var files []string
 	fileExt := getenv("KXD_MATCHER", ".conf")
-	filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
+	err := filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
 		if !f.IsDir() {
 			if strings.Contains(f.Name(), fileExt) {
 				files = append(files, f.Name())
@@ -94,6 +97,9 @@ func getConfigs(configFileLocation string) []string {
 		}
 		return nil
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
 	files = append(files, "unset")
 	sort.Strings(files)
 	return files
