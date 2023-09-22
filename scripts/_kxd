@@ -7,11 +7,11 @@ fi
 
 KUBECONFIG="$KUBECONFIG" _kxd_prompt
 
-selected_config="$HOME/.kube/$(cat ~/.kxd)"
+selected_config="$(cat ~/.kxd)"
 
 if [ -z "$selected_config" ]
 then
   unset KUBECONFIG
 else
-  export KUBECONFIG="$selected_config"
+  export KUBECONFIG="$HOME/.kube/$selected_config"
 fi
