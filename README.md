@@ -38,7 +38,7 @@ Add the following to your bash profile or zshrc then open new terminal or source
 alias kxd="source _kxd"
 ```
 
-Ex. `echo 'alias kxd="source _kxd"' >> ~/.zshrc`
+Ex. `echo -ne '\nalias kxd="source _kxd"' >> ~/.zshrc`
 
 ## Usage
 ```sh
