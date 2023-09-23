@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
-	"github.com/manifoldco/promptui/list"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/tools/clientcmd/api"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/manifoldco/promptui"
+	"github.com/manifoldco/promptui/list"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 )
 
 const (
@@ -29,27 +30,39 @@ func newPromptUISearcher(items []string) list.Searcher {
 }
 
 func main() {
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Println("kxd version:", version)
-		os.Exit(0)
-	} else if len(os.Args) > 1 && os.Args[1] == "context" {
-		err := runContextSwitcher()
-		if err != nil {
-			log.Fatal(err)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Error getting user home directory: %v\n", err)
+	}
+
+	if len(os.Args) > 1 {
+		switch os.Args[1] {
+		case "version":
+			fmt.Println("kxd version:", version)
+		case "context":
+			err := runContextSwitcher(homeDir)
+			if err != nil {
+				log.Fatal(err)
+			}
+		default:
+			err := runConfigSwitcher(homeDir)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
 	} else {
-		err := runConfigSwitcher()
+		err := runConfigSwitcher(homeDir)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 }
 
-func runConfigSwitcher() error {
-	home := os.Getenv("HOME")
-	configFileLocation := fmt.Sprintf("%s/.kube", home)
-	configs := getConfigs(configFileLocation)
-	err := touchFile(fmt.Sprintf("%s/.kxd", home))
+func runConfigSwitcher(homeDir string) error {
+	configFileLocation := fmt.Sprintf("%s/.kube", homeDir)
+	configs := getConfigs(configFileLocation, homeDir)
+
+	err := touchFile(fmt.Sprintf("%s/.kxd", homeDir))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,30 +83,30 @@ func runConfigSwitcher() error {
 		StartInSearchMode: true,
 		Stdout:            &bellSkipper{},
 	}
-	_, result, err := prompt.Run()
 
+	_, result, err := prompt.Run()
 	if err != nil {
 		checkError(err)
-		return err
 	}
+
 	fmt.Printf(PromptColor, "Choose a config")
 	fmt.Printf(NoticeColor, "? ")
 	fmt.Printf(CyanColor, result)
 	fmt.Println("")
+
 	if result == "default" {
 		result = "config"
 	}
-	writeFile(result, home)
+	writeFile(result, homeDir)
 
 	return nil
 }
 
-func runContextSwitcher() error {
-	kubeconfigPath := getenv("KUBECONFIG", os.Getenv("HOME")+"/.kube/config")
+func runContextSwitcher(homeDir string) error {
+	kubeconfigPath := getenv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
 	config, err := initializeKubeconfig(kubeconfigPath)
 	if err != nil {
-		fmt.Printf("Error initializing kubeconfig: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error initializing kubeconfig: %v\n", err)
 	}
 
 	contexts := listContexts(kubeconfigPath)
@@ -114,12 +127,12 @@ func runContextSwitcher() error {
 		StartInSearchMode: true,
 		Stdout:            &bellSkipper{},
 	}
-	_, result, err := prompt.Run()
 
+	_, result, err := prompt.Run()
 	if err != nil {
 		checkError(err)
-		return err
 	}
+
 	fmt.Printf(PromptColor, "Choose a context")
 	fmt.Printf(NoticeColor, "? ")
 	fmt.Printf(MagentaColor, result)
@@ -127,8 +140,7 @@ func runContextSwitcher() error {
 
 	err = switchContext(config, result, kubeconfigPath)
 	if err != nil {
-		fmt.Printf("Error switching context: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error switching context: %v\n", err)
 	}
 	return nil
 }
@@ -140,9 +152,9 @@ func initializeKubeconfig(kubeconfigPath string) (*api.Config, error) {
 func listContexts(kubeconfigPath string) []string {
 	config, err := initializeKubeconfig(kubeconfigPath)
 	if err != nil {
-		fmt.Printf("Error initializing kubeconfig: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error initializing kubeconfig: %v\n", err)
 	}
+
 	var contexts []string
 	for contextName := range config.Contexts {
 		contexts = append(contexts, contextName)
@@ -174,26 +186,20 @@ func writeFile(config, loc string) {
 	}
 }
 
-func getConfigs(configFileLocation string) []string {
+func getConfigs(configFileLocation string, homeDir string) []string {
 	var files []string
 	fileExt := getenv("KXD_MATCHER", ".conf")
 	err := filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
-		if !f.IsDir() {
-			if strings.Contains(f.Name(), fileExt) {
-				files = append(files, f.Name())
-			}
+		if !f.IsDir() && strings.Contains(f.Name(), fileExt) {
+			files = append(files, f.Name())
 		}
 		return nil
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
-	if len(files) < 1 {
-		fmt.Println("No matching config files found.")
-		os.Exit(1)
-	}
-	_, err = os.Stat(fmt.Sprintf("%s/.kube/config", os.Getenv("HOME")))
-	if err == nil {
+
+	if _, err := os.Stat(fmt.Sprintf("%s/.kube/config", homeDir)); err == nil {
 		files = append(files, "default")
 	}
 	files = append(files, "unset")
