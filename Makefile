@@ -7,6 +7,11 @@ install:       ## Install Target
 	GOOS= GOARCH= GOARM= GOFLAGS= go build -o ${BINDIR}/_kxd_prompt
 	cp scripts/_kxd ${BINDIR}/_kxd
 	@echo " -=-=--=-=-=-=-=-=-=-=-=-=-=-=- "
+	@echo "        __ __   _  __    ____   "
+	@echo "       / //_/  | |/ /   / __ \  "
+	@echo "      / ,<     |   /   / / / /  "
+	@echo "     / /| |   /   |   / /_/ /   "
+	@echo "    /_/ |_|  /_/|_|  /_____/    "
 	@echo "                                "
 	@echo "   To Finish Installation add   "
 	@echo "                                "

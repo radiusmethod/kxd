@@ -100,6 +100,10 @@ func getConfigs(configFileLocation string) []string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if len(files) < 1 {
+		fmt.Println("No matching config files found.")
+		os.Exit(1)
+	}
 	files = append(files, "unset")
 	sort.Strings(files)
 	return files
