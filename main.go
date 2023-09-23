@@ -36,11 +36,17 @@ func main() {
 	}
 
 	if len(os.Args) > 1 {
-		switch os.Args[1] {
-		case "version":
+		arg := strings.ToLower(os.Args[1])
+		switch arg {
+		case "-v", "--v", "version":
 			fmt.Println("kxd version:", version)
-		case "context":
+		case "-c", "--c", "context":
 			err := runContextSwitcher(homeDir)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "-h", "--h", "help":
+			err := displayHelp()
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -56,6 +62,22 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+}
+
+func displayHelp() error {
+	var helpMessage strings.Builder
+	options := map[string]string{
+		"no operation": "Switch configs.",
+		"       -c   ": "Switch contexts.",
+		"       -h   ": "Help. Displays this message.",
+		"       -v   ": "Displays version.",
+	}
+	helpMessage.WriteString("Usage: kxd [OPERATION]\n")
+	for option, description := range options {
+		helpMessage.WriteString(fmt.Sprintf("  %s: %s\n", option, description))
+	}
+	fmt.Println(helpMessage.String())
+	return nil
 }
 
 func runConfigSwitcher(homeDir string) error {
