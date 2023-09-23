@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/manifoldco/promptui"
 	"github.com/manifoldco/promptui/list"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,9 +14,10 @@ import (
 )
 
 const (
-	NoticeColor = "\033[0;38m%s\u001B[0m"
-	PromptColor = "\033[1;38m%s\u001B[0m"
-	CyanColor   = "\033[0;36m%s\033[0m"
+	NoticeColor  = "\033[0;38m%s\u001B[0m"
+	PromptColor  = "\033[1;38m%s\u001B[0m"
+	CyanColor    = "\033[0;36m%s\033[0m"
+	MagentaColor = "\033[0;35m%s\033[0m"
 )
 
 var version string = "v0.0.3"
@@ -27,9 +30,22 @@ func newPromptUISearcher(items []string) list.Searcher {
 
 func main() {
 	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Println("kxd version", version)
+		fmt.Println("kxd version:", version)
 		os.Exit(0)
+	} else if len(os.Args) > 1 && os.Args[1] == "context" {
+		err := runContextSwitcher()
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		err := runConfigSwitcher()
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
+}
+
+func runConfigSwitcher() error {
 	home := os.Getenv("HOME")
 	configFileLocation := fmt.Sprintf("%s/.kube", home)
 	configs := getConfigs(configFileLocation)
@@ -58,7 +74,7 @@ func main() {
 
 	if err != nil {
 		checkError(err)
-		return
+		return err
 	}
 	fmt.Printf(PromptColor, "Choose a config")
 	fmt.Printf(NoticeColor, "? ")
@@ -68,6 +84,75 @@ func main() {
 		result = "config"
 	}
 	writeFile(result, home)
+
+	return nil
+}
+
+func runContextSwitcher() error {
+	kubeconfigPath := getenv("KUBECONFIG", os.Getenv("HOME")+"/.kube/config")
+	config, err := initializeKubeconfig(kubeconfigPath)
+	if err != nil {
+		fmt.Printf("Error initializing kubeconfig: %v\n", err)
+		os.Exit(1)
+	}
+
+	contexts := listContexts(kubeconfigPath)
+
+	fmt.Printf(NoticeColor, "Kubeconfig Context Switcher\n")
+	prompt := promptui.Select{
+		Label:        fmt.Sprintf(PromptColor, "Choose a context"),
+		Items:        contexts,
+		HideHelp:     true,
+		HideSelected: true,
+		Templates: &promptui.SelectTemplates{
+			Label:    "{{ . }}?",
+			Active:   fmt.Sprintf("%s {{ . | magenta }}", promptui.IconSelect),
+			Inactive: "  {{.}}",
+			Selected: "  {{ . | magenta }}",
+		},
+		Searcher:          newPromptUISearcher(contexts),
+		StartInSearchMode: true,
+		Stdout:            &bellSkipper{},
+	}
+	_, result, err := prompt.Run()
+
+	if err != nil {
+		checkError(err)
+		return err
+	}
+	fmt.Printf(PromptColor, "Choose a context")
+	fmt.Printf(NoticeColor, "? ")
+	fmt.Printf(MagentaColor, result)
+	fmt.Println("")
+
+	err = switchContext(config, result, kubeconfigPath)
+	if err != nil {
+		fmt.Printf("Error switching context: %v\n", err)
+		os.Exit(1)
+	}
+	return nil
+}
+
+func initializeKubeconfig(kubeconfigPath string) (*api.Config, error) {
+	return clientcmd.LoadFromFile(kubeconfigPath)
+}
+
+func listContexts(kubeconfigPath string) []string {
+	config, err := initializeKubeconfig(kubeconfigPath)
+	if err != nil {
+		fmt.Printf("Error initializing kubeconfig: %v\n", err)
+		os.Exit(1)
+	}
+	var contexts []string
+	for contextName := range config.Contexts {
+		contexts = append(contexts, contextName)
+	}
+	return contexts
+}
+
+func switchContext(config *api.Config, contextName string, kubeconfigPath string) error {
+	config.CurrentContext = contextName
+	return clientcmd.WriteToFile(*config, kubeconfigPath)
 }
 
 func touchFile(name string) error {

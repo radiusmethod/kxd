@@ -2,13 +2,19 @@
 
 display_help() {
   echo "Usage: kxd [OPERATION]"
-  echo " no operation    Change configs"
+  echo " no operation    Switch configs."
+  echo "  -c             Switch contexts."
   echo "  -h             Help. Displays this message."
   echo "  -v             Displays version"
 }
 
 display_version() {
   _kxd_prompt version
+  return
+}
+
+run_context() {
+  _kxd_prompt context
   return
 }
 
@@ -29,6 +35,9 @@ arg=$(echo "$1" | tr '[:upper:]' '[:lower:]')
 case "$arg" in
   -v|--v|version)
     display_version
+    ;;
+  -c|--c|context)
+    run_context
     ;;
   -h|--h|help)
     display_help
