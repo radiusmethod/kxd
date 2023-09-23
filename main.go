@@ -17,7 +17,7 @@ const (
 	CyanColor   = "\033[0;36m%s\033[0m"
 )
 
-var version string = "v0.0.2"
+var version string = "v0.0.3"
 
 func newPromptUISearcher(items []string) list.Searcher {
 	return func(searchInput string, itemIndex int) bool {

@@ -1,17 +1,39 @@
 #!/usr/bin/env bash
 
-if [[ "$1" == "version" ]]; then
+display_help() {
+  echo "Usage: kxd [OPERATION]"
+  echo " no operation    Change configs"
+  echo "  -h             Help. Displays this message."
+  echo "  -v             Displays version"
+}
+
+display_version() {
   _kxd_prompt version
   return
-fi
+}
 
-KUBECONFIG="$KUBECONFIG" _kxd_prompt
+run_main() {
+  KUBECONFIG="$KUBECONFIG" _kxd_prompt
+  selected_config="$(cat ~/.kxd)"
 
-selected_config="$(cat ~/.kxd)"
+  if [ -z "$selected_config" ]
+  then
+    unset KUBECONFIG
+  else
+    export KUBECONFIG="$HOME/.kube/$selected_config"
+  fi
+}
 
-if [ -z "$selected_config" ]
-then
-  unset KUBECONFIG
-else
-  export KUBECONFIG="$HOME/.kube/$selected_config"
-fi
+arg=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+
+case "$arg" in
+  -v|--v|version)
+    display_version
+    ;;
+  -h|--h|help)
+    display_help
+    ;;
+  *)
+    run_main
+    ;;
+esac
