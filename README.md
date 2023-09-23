@@ -1,35 +1,35 @@
-# kxd
+# kxd - Kubeconfig Switcher
 
-Kubeconfig Switcher in Go
-
-Easily switch between Kubeconfigs
+kxd is a command-line utility that allows you to easily switch between Kubernetes configuration files (kubeconfig) and contexts. This tool is designed to simplify the management of multiple Kubernetes clusters and contexts.
 
 <img src="assets/demo.gif" width="500">
 
-## Requirements
-min go 1.16
+## Features
 
-## Install
+- Switch between different kubeconfig files.
+- Switch between Kubernetes contexts within a kubeconfig file.
+
+## Installation
+
+Make sure you have Go installed. You can download it from [here](https://golang.org/dl/).
 
 ### Homebrew
 
-```sh
+```bash
 brew tap radiusmethod/kxd
 brew install kxd
 ```
 
 or just
 
-```sh
+```bash
 brew install radiusmethod/kxd/kxd
 ```
 ### Makefile
 
-```sh
+```bash
 make install
 ```
-
-
 
 ### To Finish Installation
 Add the following to your bash profile or zshrc then open new terminal or source that file
@@ -40,12 +40,43 @@ alias kxd="source _kxd"
 
 Ex. `echo -ne '\nalias kxd="source _kxd"' >> ~/.zshrc`
 
+## Configuration
+
+By default, Kubeconfig Switcher looks for files with an extension of `.conf`. You can customize the behavior by setting an environment variable:
+
+- `KXD_MATCHER`: The file extension used to identify kubeconfig files (default is `.conf`).
+
 ## Usage
-```sh
+
+### Switching Kubeconfig Files
+
+To switch between different kubeconfig files, use the following command:
+
+```bash
 kxd
 ```
 
-## Show your set kubeconfig in your shell prompt
+This command will display a list of available kubeconfig files in your `~/.kube` directory. Select the one you want to use.
+
+### Switching Kubernetes Contexts
+
+To switch between Kubernetes contexts within a kubeconfig file, use the following command:
+
+```bash
+kxd -c
+```
+
+This command will display a list of available contexts in your current kubeconfig file. Select the one you want to switch to.
+
+### Version
+
+To check the version of Kubeconfig Switcher, use the following command:
+
+```bash
+kxd -v
+```
+
+### Show your set kubeconfig in your shell prompt
 For better visibility into what your shell is set to it can be helpful to configure your prompt to show the value of the env variable `KUBECONFIG`.
 
 <img src="assets/screenshot.png" width="700">
@@ -71,5 +102,10 @@ function kxd_config {
 PROMPT='OTHER_PROMPT_STUFF $(kxd_info)'
 ```
 
-Looking for a naming convention besides `.conf`. You can set an environment variable that lets you specify a string 
-matcher. For example, lets say your files all end in `-config`. You'd set `KXD_MATCHER="-config"`
+## Contributing
+
+If you encounter any issues or have suggestions for improvements, please open an issue or create a pull request on [GitHub](https://github.com/radiusmethod/kxd).
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

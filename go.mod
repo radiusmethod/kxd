@@ -1,4 +1,4 @@
-module github.com/radiusmethod/awsd
+module github.com/radiusmethod/kxd
 
 go 1.20
 
