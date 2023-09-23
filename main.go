@@ -64,6 +64,9 @@ func main() {
 	fmt.Printf(NoticeColor, "? ")
 	fmt.Printf(CyanColor, result)
 	fmt.Println("")
+	if result == "default" {
+		result = "config"
+	}
 	writeFile(result, home)
 }
 
@@ -103,6 +106,10 @@ func getConfigs(configFileLocation string) []string {
 	if len(files) < 1 {
 		fmt.Println("No matching config files found.")
 		os.Exit(1)
+	}
+	_, err = os.Stat(fmt.Sprintf("%s/.kube/config", os.Getenv("HOME")))
+	if err == nil {
+		files = append(files, "default")
 	}
 	files = append(files, "unset")
 	sort.Strings(files)
