@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
 run_context() {
-  _kxd_prompt context
+  _kxd_prompt --context
   return
 }
 
 run_list_context() {
-  _kxd_prompt list-context
+  _kxd_prompt --list-context
   return
 }
 
 run_list_config() {
-  _kxd_prompt list
+  _kxd_prompt --list
   return
 }
 
 display_help() {
-  _kxd_prompt help
+  _kxd_prompt --help
   return
 }
 
 display_version() {
-  _kxd_prompt version
+  _kxd_prompt --version
   return
 }
 
@@ -40,22 +40,22 @@ run_main() {
 arg=$(echo "$1" | tr '[:upper:]' '[:lower:]')
 
 case "$arg" in
-  -c|--c|context)
+  -c|--context)
     run_context
     ;;
-  -l|--l|list)
+  -l|--list)
     run_list_config
     ;;
-  -lc|--lc|list-context)
+  -x|--list-context)
     run_list_context
     ;;
-  -h|--h|help)
+  -h|--help)
     display_help
     ;;
-  -s|--s|switch)
+  -s|--switch)
     run_main
     ;;
-  -v|--v|version)
+  -v|--version)
     display_version
     ;;
   *)

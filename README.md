@@ -80,7 +80,7 @@ kxd -l
 This command will display the currently set kubeconfig file.
 
 ```bash
-kxd -lc
+kxd -x
 ```
 
 This command will display the currently set Kubernetes Context.

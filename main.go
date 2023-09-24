@@ -10,6 +10,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/manifoldco/promptui/list"
+	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 )
@@ -35,66 +36,53 @@ func main() {
 		log.Fatalf("Error getting user home directory: %v\n", err)
 	}
 
-	if len(os.Args) > 1 {
-		arg := strings.ToLower(os.Args[1])
-		switch arg {
-		case "-v", "--v", "version":
-			fmt.Println("kxd version:", version)
-		case "-c", "--c", "context":
-			err := runContextSwitcher(homeDir)
-			if err != nil {
-				log.Fatal(err)
-			}
-		case "-l", "--l", "list":
-			err := runListConfig(homeDir)
-			if err != nil {
-				log.Fatal(err)
-			}
-		case "-lc", "--lc", "list-context":
-			err := runListContext(homeDir)
-			if err != nil {
-				log.Fatal(err)
-			}
-		case "-h", "--h", "help":
-			err := displayHelp()
-			if err != nil {
-				log.Fatal(err)
-			}
-		case "-s", "--s", "switch":
-			err := runConfigSwitcher(homeDir)
-			if err != nil {
-				log.Fatal(err)
-			}
-		default:
-			err := runConfigSwitcher(homeDir)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-	} else {
-		err := runConfigSwitcher(homeDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-}
+	var configFlag, contextFlag, listFlag, listContextFlag, versionFlag bool
 
-func displayHelp() error {
-	var helpMessage strings.Builder
-	options := map[string]string{
-		"      [-s]  ": "Switch configs.",
-		"       -c   ": "Switch contexts.",
-		"       -l   ": "List current config.",
-		"       -lc  ": "List current context.",
-		"       -h   ": "Help. Displays this message.",
-		"       -v   ": "Displays version.",
+	rootCmd := &cobra.Command{
+		Use:   "kxd",
+		Short: "kxd - switch between Kubeconfigs and contexts.",
+		Run: func(cmd *cobra.Command, args []string) {
+			if versionFlag {
+				fmt.Println("kxd version:", version)
+			} else if configFlag {
+				err := runConfigSwitcher(homeDir)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if contextFlag {
+				err := runContextSwitcher(homeDir)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if listFlag {
+				err := runListConfig(homeDir)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else if listContextFlag {
+				err := runListContext(homeDir)
+				if err != nil {
+					log.Fatal(err)
+				}
+			} else {
+				err := runConfigSwitcher(homeDir)
+				if err != nil {
+					log.Fatal(err)
+				}
+			}
+		},
 	}
-	helpMessage.WriteString("Usage: kxd [OPERATION]\n")
-	for option, description := range options {
-		helpMessage.WriteString(fmt.Sprintf("  %s: %s\n", option, description))
+
+	rootCmd.PersistentFlags().BoolVarP(&configFlag, "switch", "s", false, "Switch configs")
+	rootCmd.PersistentFlags().BoolVarP(&contextFlag, "context", "c", false, "Switch contexts")
+	rootCmd.PersistentFlags().BoolVarP(&listFlag, "list", "l", false, "List current config")
+	rootCmd.PersistentFlags().BoolVarP(&listContextFlag, "list-context", "x", false, "List current context")
+	rootCmd.PersistentFlags().BoolVarP(&versionFlag, "version", "v", false, "Displays version")
+
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
-	fmt.Println(helpMessage.String())
-	return nil
 }
 
 func runListConfig(homeDir string) error {
