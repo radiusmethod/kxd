@@ -1,4 +1,7 @@
-## v0.0.3 (UNRELEASED)
+## v0.0.4 (UNRELEASED)
+* Allow for listing of current config and context using `-l` and `-lc` flags.
+
+## v0.0.3 (September 23, 2023)
 * Added support for default config at `~/.kube/config`.
 * Added context switcher using `-c` flag.
 

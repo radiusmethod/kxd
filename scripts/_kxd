@@ -5,6 +5,16 @@ run_context() {
   return
 }
 
+run_list_context() {
+  _kxd_prompt list-context
+  return
+}
+
+run_list_config() {
+  _kxd_prompt list
+  return
+}
+
 display_help() {
   _kxd_prompt help
   return
@@ -33,8 +43,17 @@ case "$arg" in
   -c|--c|context)
     run_context
     ;;
+  -l|--l|list)
+    run_list_config
+    ;;
+  -lc|--lc|list-context)
+    run_list_context
+    ;;
   -h|--h|help)
     display_help
+    ;;
+  -s|--s|switch)
+    run_main
     ;;
   -v|--v|version)
     display_version
