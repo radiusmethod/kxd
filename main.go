@@ -21,7 +21,7 @@ const (
 	MagentaColor = "\033[0;35m%s\033[0m"
 )
 
-var version string = "v0.0.3"
+var version string = "v0.0.4"
 
 func newPromptUISearcher(items []string) list.Searcher {
 	return func(searchInput string, itemIndex int) bool {
@@ -45,8 +45,23 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
+		case "-l", "--l", "list":
+			err := runListConfig(homeDir)
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "-lc", "--lc", "list-context":
+			err := runListContext(homeDir)
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "-h", "--h", "help":
 			err := displayHelp()
+			if err != nil {
+				log.Fatal(err)
+			}
+		case "-s", "--s", "switch":
+			err := runConfigSwitcher(homeDir)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -67,8 +82,10 @@ func main() {
 func displayHelp() error {
 	var helpMessage strings.Builder
 	options := map[string]string{
-		"no operation": "Switch configs.",
+		"      [-s]  ": "Switch configs.",
 		"       -c   ": "Switch contexts.",
+		"       -l   ": "List current config.",
+		"       -lc  ": "List current context.",
 		"       -h   ": "Help. Displays this message.",
 		"       -v   ": "Displays version.",
 	}
@@ -77,6 +94,32 @@ func displayHelp() error {
 		helpMessage.WriteString(fmt.Sprintf("  %s: %s\n", option, description))
 	}
 	fmt.Println(helpMessage.String())
+	return nil
+}
+
+func runListConfig(homeDir string) error {
+	kubeconfigPath := getenv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
+	if _, err := os.Stat(kubeconfigPath); err == nil {
+		fmt.Println(kubeconfigPath)
+	} else {
+		fmt.Println("No current kubeconfig found.")
+		os.Exit(1)
+	}
+	return nil
+}
+
+func runListContext(homeDir string) error {
+	kubeconfigPath := getenv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
+	config, err := initializeKubeconfig(kubeconfigPath)
+	if err != nil {
+		log.Fatalf("Error initializing kubeconfig: %v\n", err)
+	}
+	currentContext := config.CurrentContext
+	if currentContext == "" {
+		fmt.Println("No current context found in kubeconfig.")
+		os.Exit(1)
+	}
+	fmt.Printf(currentContext + "\n")
 	return nil
 }
 
