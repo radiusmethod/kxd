@@ -1,3 +1,7 @@
+## v0.0.3 (UNRELEASED)
+* Added support for default config at `~/.kube/config`.
+* Added context switcher using `-c` flag.
+
 ## v0.0.2 (September 22, 2023)
 * Added `KXD_MATCHER` environment variable for specifying different config matchers.
 
