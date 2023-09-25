@@ -10,7 +10,6 @@ var rootCmd = &cobra.Command{
 	Use:   "kxd",
 	Short: "kxd - switch between Kubeconfigs and contexts.",
 	Long:  "Allows for switching kubeconfig files and contexts, as well as getting the current set ones.",
-	// Should we default to kxd file switch?
 }
 
 func Execute() {

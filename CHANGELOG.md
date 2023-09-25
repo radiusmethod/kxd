@@ -1,4 +1,4 @@
-## v0.0.4 (UNRELEASED)
+## v0.0.4 (September 25, 2023)
 * Allow for listing of current config and context.
 
 ## v0.0.3 (September 23, 2023)

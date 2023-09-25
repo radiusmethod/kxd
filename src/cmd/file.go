@@ -17,7 +17,6 @@ var fileCmd = &cobra.Command{
 	Short:   "Kubeconfig file command",
 	Aliases: []string{"f"},
 	Long:    "This is the default file command.",
-	//	Should this default to file switch?
 }
 
 var currentFileCmd = &cobra.Command{

@@ -15,7 +15,6 @@ var contextCmd = &cobra.Command{
 	Short:   "Kubeconfig context command",
 	Aliases: []string{"ctx"},
 	Long:    "This is the default context command.",
-	//	Should this default to context switch?
 }
 
 var currentContextCmd = &cobra.Command{
