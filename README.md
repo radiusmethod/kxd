@@ -48,12 +48,14 @@ By default, Kubeconfig Switcher looks for files with an extension of `.conf`. Yo
 
 ## Usage
 
+ * See docs for more info [kxd](docs/kxd.md)
+
 ### Switching Kubeconfig Files
 
 To switch between different kubeconfig files, use the following command:
 
 ```bash
-kxd
+kxd f s
 ```
 
 This command will display a list of available kubeconfig files in your `~/.kube` directory. Select the one you want to use.
@@ -63,7 +65,7 @@ This command will display a list of available kubeconfig files in your `~/.kube`
 To switch between Kubernetes contexts within a kubeconfig file, use the following command:
 
 ```bash
-kxd -c
+kxd ctx s
 ```
 
 This command will display a list of available contexts in your current kubeconfig file. Select the one you want to switch to.
@@ -74,13 +76,13 @@ This command will display a list of available contexts in your current kubeconfi
 To list the currently set Kubeconfig or Kubernetes Context, use the following commands:
 
 ```bash
-kxd -l
+kxd f c
 ```
 
 This command will display the currently set kubeconfig file.
 
 ```bash
-kxd -x
+kxd ctx c
 ```
 
 This command will display the currently set Kubernetes Context.
@@ -90,7 +92,7 @@ This command will display the currently set Kubernetes Context.
 To check the version of Kubeconfig Switcher, use the following command:
 
 ```bash
-kxd -v
+kxd version
 ```
 
 ### Show your set kubeconfig in your shell prompt
