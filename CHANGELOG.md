@@ -1,3 +1,6 @@
+## v0.0.5 (September 25, 2023)
+* Small fix for running `kxd file switch -h`.
+
 ## v0.0.4 (September 25, 2023)
 * Allow for listing of current config and context.
 
