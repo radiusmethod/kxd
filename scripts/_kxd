@@ -1,32 +1,10 @@
 #!/usr/bin/env bash
 
-run_context() {
-  _kxd_prompt --context
-  return
-}
-
-run_list_context() {
-  _kxd_prompt --list-context
-  return
-}
-
-run_list_config() {
-  _kxd_prompt --list
-  return
-}
-
-display_help() {
-  _kxd_prompt --help
-  return
-}
-
-display_version() {
-  _kxd_prompt --version
-  return
-}
+arg1="$1"
+arg2="$2"
 
 run_main() {
-  KUBECONFIG="$KUBECONFIG" _kxd_prompt
+  KUBECONFIG="$KUBECONFIG" _kxd_prompt file switch
   selected_config="$(cat ~/.kxd)"
 
   if [ -z "$selected_config" ]
@@ -37,28 +15,24 @@ run_main() {
   fi
 }
 
-arg=$(echo "$1" | tr '[:upper:]' '[:lower:]')
+run_file() {
+  case "$arg2" in
+    s|switch)
+      run_main
+      ;;
+    *)
+      _kxd_prompt "$@"
+      return
+      ;;
+  esac
+}
 
-case "$arg" in
-  -c|--context)
-    run_context
-    ;;
-  -l|--list)
-    run_list_config
-    ;;
-  -x|--list-context)
-    run_list_context
-    ;;
-  -h|--help)
-    display_help
-    ;;
-  -s|--switch)
-    run_main
-    ;;
-  -v|--version)
-    display_version
+case "$arg1" in
+  f|file)
+    run_file "$arg2"
     ;;
   *)
-    run_main
+    _kxd_prompt "$@"
+    return
     ;;
 esac
