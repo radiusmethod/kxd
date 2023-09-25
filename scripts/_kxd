@@ -29,7 +29,7 @@ run_file() {
 
 case "$arg1" in
   f|file)
-    run_file "$arg2"
+    run_file "$@"
     ;;
   *)
     _kxd_prompt "$@"
