@@ -42,9 +42,10 @@ Ex. `echo -ne '\nalias kxd="source _kxd"' >> ~/.zshrc`
 
 ## Configuration
 
-By default, Kubeconfig Switcher looks for files with an extension of `.conf`. You can customize the behavior by setting an environment variable:
+By default, Kubeconfig Switcher looks for files with an extension of `.conf`. You can customize the behavior by setting an environment variable.
+This can be a single matcher or a comma seperated string for multiple matchers.
 
-- `KXD_MATCHER`: The file extension used to identify kubeconfig files (default is `.conf`).
+- `KXD_MATCHER`: The file matcher(s) used to identify kubeconfig files (default is `.conf`).
 
 ## Usage
 
