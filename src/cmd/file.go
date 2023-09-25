@@ -110,10 +110,13 @@ func runGetCurrentConfig() error {
 
 func getConfigs(configFileLocation string, homeDir string) []string {
 	var files []string
-	fileExt := utils.GetEnv("KXD_MATCHER", ".conf")
+	fileExts := strings.Split(utils.GetEnv("KXD_MATCHER", ".conf"), ",")
 	err := filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
-		if !f.IsDir() && strings.Contains(f.Name(), fileExt) {
-			files = append(files, f.Name())
+		for _, value := range fileExts {
+			if !f.IsDir() && strings.Contains(f.Name(), value) {
+				files = append(files, f.Name())
+				break
+			}
 		}
 		return nil
 	})
