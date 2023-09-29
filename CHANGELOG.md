@@ -1,4 +1,4 @@
-## v0.0.6 (UNRELEASED)
+## v0.0.6 (September 29, 2023)
 * Allow for specifying multiple matchers as a comma seperated string for `KXD_MATCHER` environment variable.
 
 ## v0.0.5 (September 25, 2023)
