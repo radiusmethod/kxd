@@ -1,19 +1,19 @@
-## kxd context switch
+## kxd context list
 
-Switch kubeconfig contexts
+List kubeconfig contexts
 
 ### Synopsis
 
-This allows for switching of your kubeconfig context.
+This displays a simple list of your kubeconfig contexts.
 
 ```
-kxd context switch [flags]
+kxd context list [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for switch
+  -h, --help   help for list
 ```
 
 ### SEE ALSO

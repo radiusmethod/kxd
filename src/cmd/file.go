@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/manifoldco/promptui"
-	"github.com/radiusmethod/kxd/src/utils"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/manifoldco/promptui"
+	"github.com/radiusmethod/kxd/src/utils"
+	"github.com/spf13/cobra"
 )
 
 var fileCmd = &cobra.Command{
@@ -45,22 +46,30 @@ var switchFileCmd = &cobra.Command{
 	},
 }
 
+var listFileCmd = &cobra.Command{
+	Use:     "list",
+	Short:   "List kubeconfigs",
+	Aliases: []string{"l"},
+	Long:    "This displays a simple list of your kubeconfigs.",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := runConfigLister()
+		if err != nil {
+			log.Fatal(err)
+		}
+	},
+}
+
 func init() {
-	fileCmd.AddCommand(switchFileCmd)
-	fileCmd.AddCommand(currentFileCmd)
+	fileCmd.AddCommand(switchFileCmd, currentFileCmd, listFileCmd)
 	rootCmd.AddCommand(fileCmd)
 }
 
 func runConfigSwitcher() error {
-	homeDir := utils.GetHomeDir()
-	configFileLocation := fmt.Sprintf("%s/.kube", homeDir)
-	configs := getConfigs(configFileLocation, homeDir)
-
-	err := utils.TouchFile(fmt.Sprintf("%s/.kxd", homeDir))
+	configs := getConfigs()
+	err := utils.TouchFile(filepath.Join(utils.GetHomeDir(), ".kxd"))
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	fmt.Printf(utils.NoticeColor, "Kubeconfig Switcher\n")
 	prompt := promptui.Select{
 		Label:        fmt.Sprintf(utils.PromptColor, "Choose a config"),
@@ -91,25 +100,27 @@ func runConfigSwitcher() error {
 	if result == "default" {
 		result = "config"
 	}
-	utils.WriteFile(result, homeDir)
+	utils.WriteFile(result, utils.GetHomeDir())
 
 	return nil
 }
 
 func runGetCurrentConfig() error {
-	homeDir := utils.GetHomeDir()
-	kubeconfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
-	if _, err := os.Stat(kubeconfigPath); err == nil {
-		fmt.Println(kubeconfigPath)
+	kubeconfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(utils.GetHomeDir(), ".kube/config"))
+	if _, err := os.Stat(kubeconfigPath); os.IsNotExist(err) {
+		log.Fatal("No current kubeconfig found.")
+	} else if err != nil {
+		log.Fatal(err)
 	} else {
-		fmt.Println("No current kubeconfig found.")
-		os.Exit(1)
+		fmt.Println(kubeconfigPath)
 	}
 	return nil
 }
 
-func getConfigs(configFileLocation string, homeDir string) []string {
+func getConfigs() []string {
 	var files []string
+	configFileLocation := utils.GetConfigFileLocation()
+
 	fileExts := strings.Split(utils.GetEnv("KXD_MATCHER", ".conf"), ",")
 	err := filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
 		for _, value := range fileExts {
@@ -120,14 +131,24 @@ func getConfigs(configFileLocation string, homeDir string) []string {
 		}
 		return nil
 	})
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if _, err := os.Stat(fmt.Sprintf("%s/.kube/config", homeDir)); err == nil {
+	defaultConfigPath := filepath.Join(utils.GetHomeDir(), ".kube/config")
+	if _, err := os.Stat(defaultConfigPath); err == nil {
 		files = append(files, "default")
 	}
 	files = append(files, "unset")
 	sort.Strings(files)
 	return files
+}
+
+func runConfigLister() error {
+	configs := getConfigs()
+	for _, c := range configs {
+		fmt.Println(c)
+	}
+	return nil
 }

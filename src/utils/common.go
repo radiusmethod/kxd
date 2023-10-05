@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func TouchFile(name string) error {
@@ -50,4 +51,25 @@ func GetHomeDir() string {
 		log.Fatalf("Error getting user home directory: %v\n", err)
 	}
 	return homeDir
+}
+
+func GetConfigFileLocation() string {
+	configFileLocation := filepath.Join(GetHomeDir(), ".kube")
+	if IsDirectoryExists(configFileLocation) {
+		return filepath.Join(configFileLocation)
+	}
+	log.Fatalf("~/.kube directory does not exist!")
+	return ""
+}
+
+func GetCurrentConfigFile() string {
+	return GetEnv("KUBECONFIG", filepath.Join(GetHomeDir(), ".kube/config"))
+}
+
+func IsDirectoryExists(path string) bool {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return info.IsDir()
 }

@@ -1,3 +1,7 @@
+## v0.0.7 (UNRELEASED)
+* Added list command to `kxd file` and `kxd ctx`.
+* The root command now defaults to `kxd file switch` if no sub-commands are passed in.
+
 ## v0.0.6 (September 29, 2023)
 * Allow for specifying multiple matchers as a comma seperated string for `KXD_MATCHER` environment variable.
 
