@@ -72,9 +72,9 @@ kxd ctx s
 This command will display a list of available contexts in your current kubeconfig file. Select the one you want to switch to.
 
 
-### Listing Current Kubeconfig or Kubernetes Context
+### Getting Current Kubeconfig or Kubernetes Context
 
-To list the currently set Kubeconfig or Kubernetes Context, use the following commands:
+To get the currently set Kubeconfig or Kubernetes Context, use the following commands:
 
 ```bash
 kxd f c

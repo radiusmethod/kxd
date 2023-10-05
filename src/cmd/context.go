@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"log"
 	"os"
-	"path/filepath"
 )
 
 var contextCmd = &cobra.Command{
@@ -43,15 +42,26 @@ var switchContextCmd = &cobra.Command{
 	},
 }
 
+var listContextsCmd = &cobra.Command{
+	Use:     "list",
+	Short:   "List kubeconfig contexts",
+	Aliases: []string{"l"},
+	Long:    "This displays a simple list of your kubeconfig contexts.",
+	Run: func(cmd *cobra.Command, args []string) {
+		err := runContextLister()
+		if err != nil {
+			log.Fatal(err)
+		}
+	},
+}
+
 func init() {
-	contextCmd.AddCommand(switchContextCmd)
-	contextCmd.AddCommand(currentContextCmd)
+	contextCmd.AddCommand(switchContextCmd, currentContextCmd, listContextsCmd)
 	rootCmd.AddCommand(contextCmd)
 }
 
 func runContextSwitcher() error {
-	homeDir := utils.GetHomeDir()
-	kubeconfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
+	kubeconfigPath := utils.GetCurrentConfigFile()
 	config, err := utils.InitializeKubeconfig(kubeconfigPath)
 	if err != nil {
 		log.Fatalf("Error initializing kubeconfig: %v\n", err)
@@ -94,8 +104,7 @@ func runContextSwitcher() error {
 }
 
 func runListContext() error {
-	homeDir := utils.GetHomeDir()
-	kubeconfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(homeDir, ".kube/config"))
+	kubeconfigPath := utils.GetCurrentConfigFile()
 	config, err := utils.InitializeKubeconfig(kubeconfigPath)
 	if err != nil {
 		log.Fatalf("Error initializing kubeconfig: %v\n", err)
@@ -106,5 +115,13 @@ func runListContext() error {
 		os.Exit(1)
 	}
 	fmt.Printf(currentContext + "\n")
+	return nil
+}
+
+func runContextLister() error {
+	contexts := utils.ListContexts(utils.GetCurrentConfigFile())
+	for _, c := range contexts {
+		fmt.Println(c)
+	}
 	return nil
 }

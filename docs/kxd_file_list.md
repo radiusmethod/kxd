@@ -1,19 +1,19 @@
-## kxd file switch
+## kxd file list
 
-Switch kubeconfig
+List kubeconfigs
 
 ### Synopsis
 
-This allows for switching of your kubeconfig.
+This displays a simple list of your kubeconfigs.
 
 ```
-kxd file switch [flags]
+kxd file list [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for switch
+  -h, --help   help for list
 ```
 
 ### SEE ALSO

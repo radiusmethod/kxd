@@ -4,6 +4,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"log"
+	"sort"
 )
 
 func InitializeKubeconfig(kubeconfigPath string) (*api.Config, error) {
@@ -25,5 +26,6 @@ func ListContexts(kubeconfigPath string) []string {
 	for contextName := range config.Contexts {
 		contexts = append(contexts, contextName)
 	}
+	sort.Strings(contexts)
 	return contexts
 }
