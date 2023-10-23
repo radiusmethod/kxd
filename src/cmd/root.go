@@ -2,9 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/radiusmethod/kxd/src/utils"
 	"github.com/spf13/cobra"
-	"os"
 	"log"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
@@ -20,8 +21,40 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if shouldRunDirectConfigSwitch() {
+		config := os.Args[1]
+		if err := directConfigSwitch(config); err != nil {
+			log.Fatal(err)
+		}
+		return
 	}
+	runRootCmd()
+}
+
+func directConfigSwitch(desiredConfig string) error {
+	configs := utils.GetConfigs()
+	if utils.Contains(configs, desiredConfig) {
+		fmt.Printf(utils.PromptColor, "Config ")
+		fmt.Printf(utils.CyanColor, desiredConfig)
+		fmt.Printf(utils.PromptColor, " set.\n")
+		utils.WriteFile(desiredConfig, utils.GetHomeDir())
+		return nil
+	}
+
+	fmt.Printf(utils.NoticeColor, "WARNING: Config ")
+	fmt.Printf(utils.CyanColor, desiredConfig)
+	fmt.Printf(utils.NoticeColor, " does not exist or is invalid.\n")
+
+	return nil
+}
+
+func runRootCmd() {
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func shouldRunDirectConfigSwitch() bool {
+	invalidConfigs := []string{"f", "file", "ctx", "context", "completion", "help", "--help", "v", "version"}
+	return len(os.Args) > 1 && !utils.Contains(invalidConfigs, os.Args[1])
 }

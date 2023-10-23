@@ -1,4 +1,5 @@
 ## v0.0.7 (UNRELEASED)
+* Added support for setting config names as argument.
 * Added list command to `kxd file` and `kxd ctx`.
 * The root command now defaults to `kxd file switch` if no sub-commands are passed in.
 

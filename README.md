@@ -53,7 +53,14 @@ This can be a single matcher or a comma seperated string for multiple matchers.
 
 ### Switching Kubeconfig Files
 
-To switch between different kubeconfig files, use the following command:
+It is possible to shortcut the menu selection by passing the config name you want to switch to as an argument.
+
+```bash
+> kxd dev.conf
+Config dev.conf set.
+```
+
+To switch between different kubeconfig files using the menu, use the following command:
 
 ```bash
 kxd f s
@@ -96,6 +103,13 @@ To check the version of Kubeconfig Switcher, use the following command:
 kxd version
 ```
 
+## Persist KUBECONFIG across new shells
+To persist the set config when you open new terminal windows, you can add the following to your bash profile or zshrc.
+
+```bash
+export KUBECONFIG=$(cat ~/.kxd)
+```
+
 ### Show your set kubeconfig in your shell prompt
 For better visibility into what your shell is set to it can be helpful to configure your prompt to show the value of the env variable `KUBECONFIG`.
 
@@ -121,6 +135,24 @@ function kxd_config {
 ```sh
 PROMPT='OTHER_PROMPT_STUFF $(kxd_info)'
 ```
+
+## Add autocompletion
+You can add autocompletion when passing config as argument by creating a script with the following. I put it in
+`~/bin/kxd_autocomplete.sh`, then source that script and add to your bash profile or zshrc file.
+`source ~/bin/kxd_autocomplete.sh`
+
+```bash
+[ "$BASH_VERSION" ] && KXD_CMD="kxd" || KXD_CMD="_kxd"
+_kxd_completion() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local suggestions=$(kxd file list)
+    COMPREPLY=($(compgen -W "$suggestions" -- $cur))
+    return 0
+}
+complete -o nospace -F _kxd_completion "${KXD_CMD}"
+```
+
+Now you can do `kxd my-k` and hit tab and if you had a config `my-kubeconfig` it would autocomplete and find it.
 
 ## Contributing
 

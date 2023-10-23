@@ -2,15 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"path/filepath"
-	"sort"
-	"strings"
-
 	"github.com/manifoldco/promptui"
 	"github.com/radiusmethod/kxd/src/utils"
 	"github.com/spf13/cobra"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 var fileCmd = &cobra.Command{
@@ -65,7 +62,7 @@ func init() {
 }
 
 func runConfigSwitcher() error {
-	configs := getConfigs()
+	configs := utils.GetConfigs()
 	err := utils.TouchFile(filepath.Join(utils.GetHomeDir(), ".kxd"))
 	if err != nil {
 		log.Fatal(err)
@@ -117,36 +114,8 @@ func runGetCurrentConfig() error {
 	return nil
 }
 
-func getConfigs() []string {
-	var files []string
-	configFileLocation := utils.GetConfigFileLocation()
-
-	fileExts := strings.Split(utils.GetEnv("KXD_MATCHER", ".conf"), ",")
-	err := filepath.Walk(configFileLocation, func(path string, f os.FileInfo, _ error) error {
-		for _, value := range fileExts {
-			if !f.IsDir() && strings.Contains(f.Name(), value) {
-				files = append(files, f.Name())
-				break
-			}
-		}
-		return nil
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defaultConfigPath := filepath.Join(utils.GetHomeDir(), ".kube/config")
-	if _, err := os.Stat(defaultConfigPath); err == nil {
-		files = append(files, "default")
-	}
-	files = append(files, "unset")
-	sort.Strings(files)
-	return files
-}
-
 func runConfigLister() error {
-	configs := getConfigs()
+	configs := utils.GetConfigs()
 	for _, c := range configs {
 		fmt.Println(c)
 	}
