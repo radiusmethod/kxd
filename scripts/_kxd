@@ -1,47 +1,13 @@
 #!/usr/bin/env bash
 
-arg1="$1"
-arg2="$2"
-arg3="$3"
+# Call kxd with any provided arguments
+_kxd_prompt "$@"
 
-run_main() {
-  KUBECONFIG="$KUBECONFIG" _kxd_prompt file switch
-  selected_config="$(cat ~/.kxd)"
+selected_config="$(cat $HOME/.kxd)"
 
-  if [ -z "$selected_config" ]
-  then
-    unset KUBECONFIG
-  else
-    export KUBECONFIG="$HOME/.kube/$selected_config"
-  fi
-}
-
-run_file() {
-  case "$arg2" in
-    s|switch)
-        case "$arg3" in
-          -h|--help|help)
-            _kxd_prompt file switch -h
-            ;;
-          *)
-            run_main
-            return
-            ;;
-        esac
-      ;;
-    *)
-      _kxd_prompt "$@"
-      return
-      ;;
-  esac
-}
-
-case "$arg1" in
-  f|file)
-    run_file "$@"
-    ;;
-  *)
-    _kxd_prompt "$@"
-    return
-    ;;
-esac
+# Set or unset KUBECONFIG based on content of $HOME/.kxd
+if [ -z "$selected_config" ]; then
+  unset KUBECONFIG
+else
+  export KUBECONFIG="$HOME/.kube/$selected_config"
+fi
