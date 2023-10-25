@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var fileCmd = &cobra.Command{
@@ -103,14 +104,28 @@ func runConfigSwitcher() error {
 }
 
 func runGetCurrentConfig() error {
-	kubeconfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(utils.GetHomeDir(), ".kube/config"))
-	if _, err := os.Stat(kubeconfigPath); os.IsNotExist(err) {
-		log.Fatal("No current kubeconfig found.")
-	} else if err != nil {
-		log.Fatal(err)
-	} else {
-		fmt.Println(kubeconfigPath)
+	homeDir := utils.GetHomeDir()
+	kxdPath := filepath.Join(homeDir, ".kxd")
+
+	defaultKubeConfigPath := filepath.Join(homeDir, ".kube", "config")
+	configPath := defaultKubeConfigPath
+
+	if _, err := os.Stat(kxdPath); !os.IsNotExist(err) {
+		content, _ := os.ReadFile(kxdPath)
+		trimmedContent := strings.TrimSpace(string(content))
+		if trimmedContent != "" {
+			specifiedConfigPath := filepath.Join(homeDir, ".kube", trimmedContent)
+			if _, err := os.Stat(specifiedConfigPath); !os.IsNotExist(err) {
+				configPath = specifiedConfigPath
+			}
+		}
 	}
+
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		log.Fatal("Kubeconfig not found")
+	}
+
+	fmt.Println(configPath)
 	return nil
 }
 
