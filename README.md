@@ -1,5 +1,7 @@
 # kxd - Kubeconfig Switcher
 
+<img src="assets/kxd.png" width="200">
+
 kxd is a command-line utility that allows you to easily switch between Kubernetes configuration files (kubeconfig) and contexts. This tool is designed to simplify the management of multiple Kubernetes clusters and contexts.
 
 <img src="assets/demo.gif" width="500">
