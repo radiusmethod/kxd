@@ -37,6 +37,9 @@ func directConfigSwitch(desiredConfig string) error {
 		fmt.Printf(utils.PromptColor, "Config ")
 		fmt.Printf(utils.CyanColor, desiredConfig)
 		fmt.Printf(utils.PromptColor, " set.\n")
+		if desiredConfig == "default" {
+			desiredConfig = "config"
+		}
 		utils.WriteFile(desiredConfig, utils.GetHomeDir())
 		return nil
 	}
