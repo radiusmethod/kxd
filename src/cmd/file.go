@@ -107,14 +107,20 @@ func runGetCurrentConfig() error {
 	homeDir := utils.GetHomeDir()
 	kxdPath := filepath.Join(homeDir, ".kxd")
 
-	defaultKubeConfigPath := filepath.Join(homeDir, ".kube", "config")
+	// Default to KUBECONFIG env var then ~/.kube/config if .kxd config doesn't exist
+	defaultKubeConfigPath := utils.GetEnv("KUBECONFIG", filepath.Join(homeDir, ".kube", "config"))
 	configPath := defaultKubeConfigPath
 
+	// Check if .kxd file exists.
 	if _, err := os.Stat(kxdPath); !os.IsNotExist(err) {
 		content, _ := os.ReadFile(kxdPath)
 		trimmedContent := strings.TrimSpace(string(content))
+
+		// If .kxd file is not empty, determine the specified kubeconfig path.
 		if trimmedContent != "" {
 			specifiedConfigPath := filepath.Join(homeDir, ".kube", trimmedContent)
+
+			// If the specified kubeconfig exists, update the configPath.
 			if _, err := os.Stat(specifiedConfigPath); !os.IsNotExist(err) {
 				configPath = specifiedConfigPath
 			}
