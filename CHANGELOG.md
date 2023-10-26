@@ -1,3 +1,7 @@
+## v0.0.8 (October 25, 2023)
+* Fix for setting default as argument.
+* Changed the way kxd file current works to check `~/.kxd` file then default to `~/.kube/config`.
+
 ## v0.0.7 (October 23, 2023)
 * Added support for setting config names as argument.
 * Added list command to `kxd file` and `kxd ctx`.

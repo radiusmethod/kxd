@@ -107,7 +107,7 @@ kxd version
 To persist the set config when you open new terminal windows, you can add the following to your bash profile or zshrc.
 
 ```bash
-export KUBECONFIG=$(cat ~/.kxd)
+export KUBECONFIG=$(kxd file current)
 ```
 
 ### Show your set kubeconfig in your shell prompt
