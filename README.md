@@ -139,22 +139,16 @@ PROMPT='OTHER_PROMPT_STUFF $(kxd_info)'
 ```
 
 ## Add autocompletion
-You can add autocompletion when passing config as argument by creating a script with the following. I put it in
-`~/bin/kxd_autocomplete.sh`, then source that script and add to your bash profile or zshrc file.
-`source ~/bin/kxd_autocomplete.sh`
-
-```bash
-[ "$BASH_VERSION" ] && KXD_CMD="kxd" || KXD_CMD="_kxd"
-_kxd_completion() {
-    local cur=${COMP_WORDS[COMP_CWORD]}
-    local suggestions=$(kxd file list)
-    COMPREPLY=($(compgen -W "$suggestions" -- $cur))
-    return 0
-}
-complete -o nospace -F _kxd_completion "${KXD_CMD}"
-```
+You can add autocompletion when passing config as argument by adding the following to your bash profile or zshrc file.
+`source _kxd_autocomplete`
 
 Now you can do `kxd my-k` and hit tab and if you had a config `my-kubeconfig` it would autocomplete and find it.
+
+## TL;DR (full config example)
+alias kxd="source _kxd"
+source _kxd_autocomplete
+export KXD_MATCHER="-config,.conf"
+export KUBECONFIG=$(kxd file current)
 
 ## Contributing
 
