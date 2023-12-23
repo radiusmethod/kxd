@@ -6,6 +6,7 @@ help:          ## Show this help
 install:       ## Install Target
 	GOOS= GOARCH= GOARM= GOFLAGS= go build -o ${BINDIR}/_kxd_prompt
 	cp scripts/_kxd ${BINDIR}/_kxd
+	cp scripts/_kxd_autocomplete ${BINDIR}/_kxd_autocomplete
 	@echo " -=-=--=-=-=-=-=-=-=-=-=-=-=-=- "
 	@echo "        __ __   _  __    ____   "
 	@echo "       / //_/  | |/ /   / __ \  "
@@ -25,4 +26,5 @@ install:       ## Install Target
 
 uninstall:     ## Uninstall Target
 	rm -f ${BINDIR}/_kxd
+	rm -f ${BINDIR}/_kxd_autocomplete
 	rm -f ${BINDIR}/_kxd_prompt

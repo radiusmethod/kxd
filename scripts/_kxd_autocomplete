@@ -1,0 +1,9 @@
+
+[ "$BASH_VERSION" ] && KXD_CMD="kxd" || KXD_CMD="_kxd"
+_kxd_completion() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local suggestions=$(kxd file list)
+    COMPREPLY=($(compgen -W "$suggestions" -- $cur))
+    return 0
+}
+complete -o nospace -F _kxd_completion "${KXD_CMD}"

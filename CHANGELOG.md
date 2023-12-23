@@ -1,3 +1,6 @@
+## v0.0.9 (December 23, 2023)
+* Added autocomplete script to install.
+
 ## v0.0.8 (October 25, 2023)
 * Fix for setting default as argument.
 * Changed the way kxd file current works to check `~/.kxd` file then default to `~/.kube/config`.
