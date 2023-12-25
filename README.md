@@ -145,10 +145,12 @@ You can add autocompletion when passing config as argument by adding the followi
 Now you can do `kxd my-k` and hit tab and if you had a config `my-kubeconfig` it would autocomplete and find it.
 
 ## TL;DR (full config example)
+```sh
 alias kxd="source _kxd"
 source _kxd_autocomplete
 export KXD_MATCHER="-config,.conf"
 export KUBECONFIG=$(kxd file current)
+```
 
 ## Contributing
 
