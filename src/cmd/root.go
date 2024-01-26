@@ -58,6 +58,6 @@ func runRootCmd() {
 }
 
 func shouldRunDirectConfigSwitch() bool {
-	invalidConfigs := []string{"f", "file", "ctx", "context", "completion", "help", "--help", "v", "version"}
+	invalidConfigs := []string{"f", "file", "ctx", "context", "ns", "namespace", "completion", "help", "--help", "v", "version"}
 	return len(os.Args) > 1 && !utils.Contains(invalidConfigs, os.Args[1])
 }
