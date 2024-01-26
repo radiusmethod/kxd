@@ -1,4 +1,4 @@
-## v0.1.0 (UNRELEASED)
+## v0.1.0 (January 26, 2024)
 * Added namespace command.
 
 ## v0.0.9 (December 23, 2023)
