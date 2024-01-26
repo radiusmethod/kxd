@@ -1,3 +1,6 @@
+## v0.1.0 (UNRELEASED)
+* Added namespace command.
+
 ## v0.0.9 (December 23, 2023)
 * Added autocomplete script to install.
 

@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"context"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"log"
@@ -8,6 +10,9 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func InitializeKubeconfig(kubeconfigPath string) (*api.Config, error) {
@@ -31,6 +36,50 @@ func ListContexts(kubeconfigPath string) []string {
 	}
 	sort.Strings(contexts)
 	return contexts
+}
+
+func ListNamespaces(kubeconfigPath string) []string {
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		log.Fatalf("Error initializing kubeconfig: %v\n", err)
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatalf("error creating Kubernetes client: %v", err)
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var namespaces []string
+	nss, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		log.Fatalf("error listing namespaces: %v", err)
+	}
+
+	for _, ns := range nss.Items {
+		namespaces = append(namespaces, ns.Name)
+	}
+
+	sort.Strings(namespaces)
+	return namespaces
+}
+
+func SwitchNamespace(namespaceName string, kubeconfigPath string) error {
+	config, err := InitializeKubeconfig(kubeconfigPath)
+	if err != nil {
+		log.Fatalf("Error initializing kubeconfig: %v\n", err)
+	}
+
+	contextName := config.CurrentContext
+	context, exists := config.Contexts[contextName]
+	if !exists {
+		log.Fatalf("Context %s does not exist in kubeconfig", contextName)
+	}
+	context.Namespace = namespaceName
+
+	return clientcmd.WriteToFile(*config, kubeconfigPath)
 }
 
 func GetConfigs() []string {
