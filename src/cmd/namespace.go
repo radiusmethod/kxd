@@ -61,11 +61,6 @@ func init() {
 
 func runNamespaceSwitcher() error {
 	kubeconfigPath := utils.GetCurrentConfigFile()
-	config, err := utils.InitializeKubeconfig(kubeconfigPath)
-	if err != nil {
-		log.Fatalf("Error initializing kubeconfig: %v\n", err)
-	}
-
 	namespaces := utils.ListNamespaces(kubeconfigPath)
 
 	fmt.Printf(utils.NoticeColor, "Kubeconfig Namespace Switcher\n")
@@ -95,7 +90,7 @@ func runNamespaceSwitcher() error {
 	fmt.Printf(utils.MagentaColor, result)
 	fmt.Println("")
 
-	err = utils.SwitchNamespace(config, result, kubeconfigPath)
+	err = utils.SwitchNamespace(result, kubeconfigPath)
 	if err != nil {
 		log.Fatalf("Error switching namespace: %v\n", err)
 	}

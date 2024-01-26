@@ -46,7 +46,7 @@ func ListNamespaces(kubeconfigPath string) []string {
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("error creating Kubernetes client: %w", err)
+		log.Fatalf("error creating Kubernetes client: %v", err)
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -55,7 +55,7 @@ func ListNamespaces(kubeconfigPath string) []string {
 	var namespaces []string
 	nss, err := clientset.CoreV1().Namespaces().List(ctx, metav1.ListOptions{})
 	if err != nil {
-		log.Fatalf("error listing namespaces: %w", err)
+		log.Fatalf("error listing namespaces: %v", err)
 	}
 
 	for _, ns := range nss.Items {
@@ -66,7 +66,7 @@ func ListNamespaces(kubeconfigPath string) []string {
 	return namespaces
 }
 
-func SwitchNamespace(config *api.Config, namespaceName string, kubeconfigPath string) error {
+func SwitchNamespace(namespaceName string, kubeconfigPath string) error {
 	config, err := InitializeKubeconfig(kubeconfigPath)
 	if err != nil {
 		log.Fatalf("Error initializing kubeconfig: %v\n", err)

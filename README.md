@@ -2,7 +2,7 @@
 
 <img src="assets/kxd.png" width="200">
 
-kxd is a command-line utility that allows you to easily switch between Kubernetes configuration files (kubeconfig) and contexts. This tool is designed to simplify the management of multiple Kubernetes clusters and contexts.
+kxd is a command-line utility that allows you to easily switch between Kubernetes configuration files (kubeconfig) contexts. This tool is designed to simplify the management of multiple Kubernetes clusters and contexts.
 
 <img src="assets/demo.gif" width="500">
 
@@ -10,6 +10,7 @@ kxd is a command-line utility that allows you to easily switch between Kubernete
 
 - Switch between different kubeconfig files.
 - Switch between Kubernetes contexts within a kubeconfig file.
+- Switch between Kubernetes namespaces in a context.
 
 ## Installation
 
@@ -80,10 +81,20 @@ kxd ctx s
 
 This command will display a list of available contexts in your current kubeconfig file. Select the one you want to switch to.
 
+### Switching Kubernetes Context Namespaces
 
-### Getting Current Kubeconfig or Kubernetes Context
+To switch between Kubernetes context namespaces within a kubeconfig context, use the following command:
 
-To get the currently set Kubeconfig or Kubernetes Context, use the following commands:
+```bash
+kxd ns s
+```
+
+This command will display a list of kubernetes namespaces in your currently set cluster. Select the one you want to switch to.
+
+
+### Getting Current Kubeconfig, Kubernetes Context or Context Namespace
+
+To get the currently set Kubeconfig, Kubernetes Context or Context Namespace, use the following commands:
 
 ```bash
 kxd f c
@@ -96,6 +107,12 @@ kxd ctx c
 ```
 
 This command will display the currently set Kubernetes Context.
+
+```bash
+kxd ns c
+```
+
+This command will display the currently set Kubernetes Context Namespace.
 
 ### Version
 
