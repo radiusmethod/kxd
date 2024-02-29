@@ -155,6 +155,36 @@ function kxd_config {
 PROMPT='OTHER_PROMPT_STUFF $(kxd_info)'
 ```
 
+To include prompt support in OhMyZsh, add the following lines to your `~/.p10k.zsh` file:
+
+```sh
+# kxd prompts
+typeset -g _kxd_config
+typeset -g _kxd_basename=''
+typeset -g _kxd_content="kx:(${_kxd_basename})"
+
+function prompt_kxd() {
+local _kxd_config="${KUBECONFIG:=}"
+if [ -z "$_kxd_config" ]
+then
+  _kxd_basename=''
+else
+  _kxd_basename="%F{cyan}$(basename $_kxd_config)%f"
+fi
+
+_kxd_content="kx:(${_kxd_basename})"
+p10k segment -b 0 -f 4 -t ${_kxd_content}
+}
+
+function instant_prompt_kxd() {
+p10k segment -b 0 -f 4 -t ${_kxd_content}
+}
+```
+
+Then add `kxd` to either your left or right prompt segments.
+
+<img src="assets/ohmyzsh-screenshot.png" width="700">
+
 ## Add autocompletion
 You can add autocompletion when passing config as argument by adding the following to your bash profile or zshrc file.
 `source _kxd_autocomplete`
