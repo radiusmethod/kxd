@@ -2,7 +2,7 @@ module github.com/radiusmethod/kxd
 
 go 1.22.0
 
-toolchain go1.22.3
+toolchain go1.22.4
 
 require (
 	github.com/manifoldco/promptui v0.9.0
