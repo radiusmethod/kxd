@@ -5,14 +5,14 @@ go 1.22.0
 toolchain go1.22.5
 
 require (
-	github.com/manifoldco/promptui v0.9.0
+	github.com/radiusmethod/promptui v0.10.0
 	github.com/spf13/cobra v1.8.1
 	k8s.io/apimachinery v0.30.3
 	k8s.io/client-go v0.30.3
 )
 
 require (
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/chzyer/readline v1.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
