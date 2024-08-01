@@ -1,3 +1,6 @@
+## v0.1.1 (UNRELEASED)
+* Adds circular scrolling #39.
+
 ## v0.1.0 (January 26, 2024)
 * Added namespace command.
 
