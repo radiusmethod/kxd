@@ -1,4 +1,4 @@
-## v0.1.1 (UNRELEASED)
+## v0.1.1 (August, 1, 2024)
 * Adds circular scrolling #39.
 
 ## v0.1.0 (January 26, 2024)
