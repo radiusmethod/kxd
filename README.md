@@ -12,6 +12,27 @@ kxd is a command-line utility that allows you to easily switch between Kubernete
 - Switch between Kubernetes contexts within a kubeconfig file.
 - Switch between Kubernetes namespaces in a context.
 
+## Table of Contents
+
+- [Installation](#installation)
+    - [Homebrew](#homebrew)
+    - [Makefile](#makefile)
+    - [To Finish Installation](#to-finish-installation)
+    - [Upgrading](#upgrading)
+    - [Configuration](#configuration)
+- [Usage](#usage)
+    - [Switching Kubeconfig Files](#switching-kubeconfig-files)
+    - [Switching Kubernetes Contexts](#switching-kubernetes-contexts)
+    - [Switching Kubernetes Context Namespaces](#switching-kubernetes-context-namespaces)
+    - [Getting Current Kubeconfig, Kubernetes Context or Context Namespace](#getting-current-kubeconfig-kubernetes-context-or-context-namespace)
+    - [Version](#version)
+    - [Persist KUBECONFIG across new shells](#persist-kubeconfig-across-new-shells)
+    - [Show your set kubeconfig in your shell prompt](#show-your-set-kubeconfig-in-your-shell-prompt)
+    - [Add autocompletion](#add-autocompletion)
+    - [TL;DR (full config example)](#tldr-full-config-example)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Installation
 
 Make sure you have Go installed. You can download it from [here](https://golang.org/dl/).
@@ -42,6 +63,13 @@ alias kxd="source _kxd"
 ```
 
 Ex. `echo -ne '\nalias kxd="source _kxd"' >> ~/.zshrc`
+
+### Upgrading
+Upgrading consists of just doing a brew update and brew upgrade.
+
+```sh
+brew update && brew upgrade radiusmethod/kxd/kxd
+```
 
 ## Configuration
 
