@@ -1,3 +1,6 @@
+## v0.1.2 (UNRELEASED)
+* Fixed a crash when scrolling through an empty list, which occurred when searches returned no results.
+
 ## v0.1.1 (August, 1, 2024)
 * Adds circular scrolling #39.
 
