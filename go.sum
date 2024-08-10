@@ -80,6 +80,8 @@ github.com/radiusmethod/promptui v0.10.1 h1:aDL6O9fQIHcLEtV8qFfkRClDHF5wpO8VQBnS
 github.com/radiusmethod/promptui v0.10.1/go.mod h1:DYozY3lsgSlf+M+LXX4QF7/QY246KqP69zhdIvPBg+8=
 github.com/radiusmethod/promptui v0.10.2 h1:EsN8QTW/ZdUEUGnXjZmVn+at6P1WXTWvS9FLEInUpFc=
 github.com/radiusmethod/promptui v0.10.2/go.mod h1:DYozY3lsgSlf+M+LXX4QF7/QY246KqP69zhdIvPBg+8=
+github.com/radiusmethod/promptui v0.10.3 h1:JeayJuCR/bPvZp5cGqd+sAk4NDZG9CCt0vBVTFIiCo8=
+github.com/radiusmethod/promptui v0.10.3/go.mod h1:DYozY3lsgSlf+M+LXX4QF7/QY246KqP69zhdIvPBg+8=
 github.com/rogpeppe/go-internal v1.10.0 h1:TMyTOH3F/DB16zRVcYyreMH6GnZZrwQVAoYjRBZyWFQ=
 github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncjaFoBhdsK/akog=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

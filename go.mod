@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.5
 
 require (
-	github.com/radiusmethod/promptui v0.10.2
+	github.com/radiusmethod/promptui v0.10.3
 	github.com/spf13/cobra v1.8.1
 	k8s.io/apimachinery v0.30.3
 	k8s.io/client-go v0.30.3

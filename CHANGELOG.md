@@ -1,3 +1,6 @@
+## v0.1.3 (August, 10, 2024)
+* Fix issue where wrong index is selected.
+
 ## v0.1.2 (August, 10, 2024)
 * Fixed a crash when scrolling through an empty list, which occurred when searches returned no results.
 
