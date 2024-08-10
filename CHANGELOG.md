@@ -1,4 +1,4 @@
-## v0.1.2 (UNRELEASED)
+## v0.1.2 (August, 10, 2024)
 * Fixed a crash when scrolling through an empty list, which occurred when searches returned no results.
 
 ## v0.1.1 (August, 1, 2024)
