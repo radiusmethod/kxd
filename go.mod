@@ -6,7 +6,7 @@ toolchain go1.22.6
 
 require (
 	github.com/radiusmethod/promptui v0.10.3
-	github.com/spf13/cobra v1.8.1
+	github.com/spf13/cobra v1.9.0
 	k8s.io/apimachinery v0.31.3
 	k8s.io/client-go v0.31.3
 )
@@ -34,7 +34,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	golang.org/x/net v0.26.0 // indirect
 	golang.org/x/oauth2 v0.21.0 // indirect
