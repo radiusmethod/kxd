@@ -114,7 +114,7 @@ func runListContext() error {
 		fmt.Println("No current context found in kubeconfig.")
 		os.Exit(1)
 	}
-	fmt.Printf(currentContext + "\n")
+	fmt.Printf("%s\n", currentContext)
 	return nil
 }
 

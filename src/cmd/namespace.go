@@ -113,7 +113,7 @@ func runListNamespace() error {
 	if namespace == "" {
 		namespace = "default"
 	}
-	fmt.Printf(namespace + "\n")
+	fmt.Printf("%s\n", namespace)
 	return nil
 }
 
