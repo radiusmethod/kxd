@@ -5,8 +5,8 @@ go 1.24.1
 require (
 	github.com/radiusmethod/promptui v0.10.3
 	github.com/spf13/cobra v1.10.2
-	k8s.io/apimachinery v0.34.2
-	k8s.io/client-go v0.34.2
+	k8s.io/apimachinery v0.35.0
+	k8s.io/client-go v0.35.0
 )
 
 require (
