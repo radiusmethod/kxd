@@ -93,6 +93,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/radiusmethod/promptui v0.10.3 h1:JeayJuCR/bPvZp5cGqd+sAk4NDZG9CCt0vBVTFIiCo8=
 github.com/radiusmethod/promptui v0.10.3/go.mod h1:DYozY3lsgSlf+M+LXX4QF7/QY246KqP69zhdIvPBg+8=
+github.com/radiusmethod/promptui v0.11.0 h1:IUP99vU3WgzIrAKicJ1ZwyTFEdTSsa9B6DUbv6GS0HA=
+github.com/radiusmethod/promptui v0.11.0/go.mod h1:w+XRl9+IuUv5Fvf/notZrM5mkyagzVCxEiNnyplHYA0=
 github.com/rogpeppe/go-internal v1.12.0 h1:exVL4IDcn6na9z1rAb56Vxr+CgyK3nn3O+epU5NdKM8=
 github.com/rogpeppe/go-internal v1.12.0/go.mod h1:E+RYuTGaKKdloAfM02xzb0FW3Paa99yedzYV+kq4uf4=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=

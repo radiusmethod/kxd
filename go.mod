@@ -3,7 +3,7 @@ module github.com/radiusmethod/kxd
 go 1.26.0
 
 require (
-	github.com/radiusmethod/promptui v0.10.3
+	github.com/radiusmethod/promptui v0.11.0
 	github.com/spf13/cobra v1.10.2
 	k8s.io/apimachinery v0.36.0
 	k8s.io/client-go v0.36.0
