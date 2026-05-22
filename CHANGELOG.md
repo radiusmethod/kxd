@@ -1,3 +1,6 @@
+## v0.1.4 (May 22, 2026)
+* Updated Kubernetes client libraries (client-go v0.36.1), cobra (v1.10.2), and Go toolchain to 1.26.
+
 ## v0.1.3 (August, 10, 2024)
 * Fix issue where wrong index is selected.
 
