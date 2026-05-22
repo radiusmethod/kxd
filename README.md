@@ -104,6 +104,16 @@ Untested by the maintainers. `~/.kube/config` symlinks created on the Windows si
 
 `scripts/_kxd.ps1` and `scripts/_kxd_autocomplete.ps1` are PowerShell equivalents of the bash wrapper and autocomplete.
 
+If you have `make` available on Windows, `Makefile_Windows` collapses steps 1–2 below into a single command:
+
+```powershell
+make -f Makefile_Windows SHELL=pwsh.exe install
+```
+
+That builds `_kxd_prompt.exe` and drops both `.ps1` files into `C:\tools\kxd\` (override with `BINDIR=...`). You still need to add that directory to `$env:PATH` and dot-source the scripts from your `$PROFILE` (step 3 below).
+
+Otherwise, manual setup:
+
 1. Build the Windows binary and put it somewhere on `$env:PATH`:
    ```powershell
    $env:GOOS = "windows"; $env:GOARCH = "amd64"

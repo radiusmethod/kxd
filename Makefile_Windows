@@ -1,0 +1,14 @@
+BINDIR = C:\tools
+
+# Requires `make` with PowerShell as the shell. Easiest way:
+#   make -f Makefile_Windows SHELL=pwsh.exe install
+# `cp` / `rm` resolve to PowerShell aliases, `New-Item` is PowerShell-native.
+
+install:       ## Install Target
+	go build -o ${BINDIR}/kxd/_kxd_prompt.exe
+	cp scripts/_kxd.ps1 ${BINDIR}/kxd/_kxd.ps1
+	cp scripts/_kxd_autocomplete.ps1 ${BINDIR}/kxd/_kxd_autocomplete.ps1
+	New-Item -ItemType File -Path ~/.kxd -Force
+
+uninstall:     ## Uninstall Target
+	rm -Force -Recurse ${BINDIR}/kxd
