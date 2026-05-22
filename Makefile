@@ -28,3 +28,14 @@ uninstall:     ## Uninstall Target
 	rm -f ${BINDIR}/_kxd
 	rm -f ${BINDIR}/_kxd_autocomplete
 	rm -f ${BINDIR}/_kxd_prompt
+
+.PHONY: test test-coverage docs
+test:          ## Run tests
+	go test ./...
+
+test-coverage: ## Run tests with coverage report
+	go test ./... -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+
+docs:          ## Regenerate docs/*.md from the cobra command tree
+	cd tools/gendocs && go run . ../../docs

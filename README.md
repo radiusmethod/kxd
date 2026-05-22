@@ -19,6 +19,7 @@ kxd is a command-line utility that allows you to easily switch between Kubernete
     - [Makefile](#makefile)
     - [To Finish Installation](#to-finish-installation)
     - [Upgrading](#upgrading)
+    - [Windows](#windows)
     - [Configuration](#configuration)
 - [Usage](#usage)
     - [Switching Kubeconfig Files](#switching-kubeconfig-files)
@@ -70,6 +71,54 @@ Upgrading consists of just doing a brew update and brew upgrade.
 ```sh
 brew update && brew upgrade radiusmethod/kxd/kxd
 ```
+
+### Windows
+
+`kxd` is designed for POSIX shells (bash/zsh): the Go binary writes the user's selection to `~/.kxd`, then a wrapper script that you `source` reads that file and exports `KUBECONFIG` into your current shell. A child process can't mutate its parent's environment, so the wrapper indirection is mandatory — and that's what makes Windows non-trivial. Three paths work:
+
+#### WSL (recommended)
+
+From a WSL2 Ubuntu/Debian shell, follow the standard Linux instructions exactly: `make install`, then add `alias kxd="source _kxd"` to `~/.bashrc` or `~/.zshrc`. From WSL's perspective it's just Linux.
+
+Caveat: the `KUBECONFIG` you set inside WSL is **not** visible to `kubectl.exe` invoked from PowerShell or `cmd`. Run `kubectl` from WSL too, or set the env var separately on the Windows side.
+
+#### Git Bash / MSYS2
+
+The Go binary cross-compiles cleanly and the bash wrapper is portable enough for Git Bash to `source`. Manual setup:
+
+1. Build the Windows binary:
+   ```sh
+   GOOS=windows GOARCH=amd64 go build -o _kxd_prompt.exe .
+   ```
+2. Copy `_kxd_prompt.exe`, `scripts/_kxd`, and `scripts/_kxd_autocomplete` to a directory on your Git Bash `PATH` (e.g. `~/bin`).
+3. Add to `~/.bashrc`:
+   ```sh
+   alias kxd="source _kxd"
+   source _kxd_autocomplete
+   ```
+4. Make sure `~/.kube/` exists with your config files. In Git Bash, `~` resolves to `C:\Users\<you>`.
+
+Untested by the maintainers. `~/.kube/config` symlinks created on the Windows side sometimes confuse path resolution.
+
+#### Native PowerShell
+
+`scripts/_kxd.ps1` and `scripts/_kxd_autocomplete.ps1` are PowerShell equivalents of the bash wrapper and autocomplete.
+
+1. Build the Windows binary and put it somewhere on `$env:PATH`:
+   ```powershell
+   $env:GOOS = "windows"; $env:GOARCH = "amd64"
+   go build -o _kxd_prompt.exe .
+   # move _kxd_prompt.exe into e.g. C:\Users\<you>\bin
+   ```
+2. Copy `scripts/_kxd.ps1` and `scripts/_kxd_autocomplete.ps1` somewhere persistent (e.g. `C:\Users\<you>\bin`).
+3. Dot-source both from your PowerShell profile (open it with `notepad $PROFILE`):
+   ```powershell
+   . "$HOME\bin\_kxd.ps1"
+   . "$HOME\bin\_kxd_autocomplete.ps1"
+   ```
+4. Restart PowerShell. `kxd` is now a function in your session.
+
+The function reads/writes `$HOME\.kxd` and `$HOME\.kube\<name>` — same layout as the POSIX version, so configs interoperate with WSL or Git Bash on the same machine if you point them at the same `.kube` directory.
 
 ## Configuration
 

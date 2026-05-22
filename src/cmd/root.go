@@ -20,6 +20,11 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// RootCmd returns the root cobra command. Used by docs generation.
+func RootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func Execute() {
 	if shouldRunDirectConfigSwitch() {
 		config := os.Args[1]
