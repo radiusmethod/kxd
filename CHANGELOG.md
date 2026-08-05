@@ -1,3 +1,26 @@
+## v0.2.0 (August 5, 2026)
+
+**Breaking.** kxd is now a single binary named `kxd`, set up with one line in your shell rc file. Pre-1.0, so no compatibility shims.
+
+* Added `kxd init <shell>` — `eval "$(kxd init zsh)"` now replaces the `kxd` alias, the completion `source`, and the `export KUBECONFIG=$(kxd file current)` persistence line. Supports bash, zsh, fish, and PowerShell.
+* Added `kxd shellenv [shell]`, which prints the export/unset statement for the active kubeconfig. This is what the generated function evals.
+* Added fish support. PowerShell setup is now one line instead of building a binary and dot-sourcing two scripts by hand.
+* The binary is installed as `kxd`, not `_kxd_prompt`. The generated integration calls it through `command kxd`, which skips the shell function of the same name.
+* Removed `scripts/` entirely: `_kxd`, `_kxd_autocomplete`, `_kxd.ps1`, and `_kxd_autocomplete.ps1`. `make install` now installs one file.
+* `~/.kxd` parsing and the `~/.kube` path join now live only in the Go code, instead of being reimplemented in every wrapper script.
+* Values are shell-quoted, so kubeconfig filenames containing spaces or quotes work.
+* Completion now covers the `file`/`context`/`namespace` subcommands and their arguments, not just top-level config names. Namespace values are excluded on purpose, since listing them calls the live cluster.
+* **Behavior change:** `kxd <unknown-config>` now writes its warning to stderr and exits 1, instead of writing to stdout and exiting 0. Scripts relying on the old exit code need updating. This keeps ANSI color codes out of the command substitutions the shell integration evals.
+
+Releases are now built by GoReleaser:
+
+* Releases ship prebuilt binaries for macOS, Linux, and Windows on amd64 and arm64, with `checksums.txt`. Installing no longer compiles from source, and Windows binaries are published for the first time.
+* Homebrew distribution moves from a formula to a **cask**, generated on each tag. Reinstall with `brew uninstall kxd && brew install radiusmethod/kxd/kxd` if brew complains about the change.
+* `kxd version` now reports the git tag, injected at build time. `make install` derives it from `git describe`, and a plain `go build` reports `dev`.
+* Prerelease tags must now be SemVer-hyphenated (`v0.3.0-beta1`), not `v0.3.0beta`.
+
+To upgrade: replace your shell config lines as described in "Upgrading from pre-v0.2.0" in the README, then delete any leftover `_kxd_prompt`, `_kxd`, and `_kxd_autocomplete` files. Your `~/.kxd` file is unchanged and carries over.
+
 ## v0.1.4 (May 22, 2026)
 * Updated Kubernetes client libraries (client-go v0.36.1), cobra (v1.10.2), and Go toolchain to 1.26.
 

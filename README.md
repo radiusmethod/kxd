@@ -16,9 +16,11 @@ kxd is a command-line utility that allows you to easily switch between Kubernete
 
 - [Installation](#installation)
     - [Homebrew](#homebrew)
+    - [Prebuilt binary](#prebuilt-binary)
     - [Makefile](#makefile)
     - [To Finish Installation](#to-finish-installation)
     - [Upgrading](#upgrading)
+    - [Upgrading from pre-v0.2.0](#upgrading-from-pre-v020)
     - [Windows](#windows)
     - [Configuration](#configuration)
 - [Usage](#usage)
@@ -27,16 +29,13 @@ kxd is a command-line utility that allows you to easily switch between Kubernete
     - [Switching Kubernetes Context Namespaces](#switching-kubernetes-context-namespaces)
     - [Getting Current Kubeconfig, Kubernetes Context or Context Namespace](#getting-current-kubeconfig-kubernetes-context-or-context-namespace)
     - [Version](#version)
-    - [Persist KUBECONFIG across new shells](#persist-kubeconfig-across-new-shells)
     - [Show your set kubeconfig in your shell prompt](#show-your-set-kubeconfig-in-your-shell-prompt)
     - [Add autocompletion](#add-autocompletion)
-    - [TL;DR (full config example)](#tldr-full-config-example)
+- [Why a shell function?](#why-a-shell-function)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Installation
-
-Make sure you have Go installed. You can download it from [here](https://golang.org/dl/).
 
 ### Homebrew
 
@@ -50,20 +49,48 @@ or just
 ```bash
 brew install radiusmethod/kxd/kxd
 ```
+
+### Prebuilt binary
+
+Grab the archive for your platform from the
+[latest release](https://github.com/radiusmethod/kxd/releases/latest), then put `kxd` somewhere on
+your `PATH`. macOS, Linux, and Windows on amd64 and arm64.
+
 ### Makefile
+
+Builds from source, so this one needs [Go](https://golang.org/dl/) installed.
 
 ```bash
 make install
 ```
 
 ### To Finish Installation
-Add the following to your bash profile or zshrc then open new terminal or source that file
+Add one line to your shell's startup file, then open a new terminal or source that file.
 
+**zsh** (`~/.zshrc`):
 ```sh
-alias kxd="source _kxd"
+eval "$(kxd init zsh)"
 ```
 
-Ex. `echo -ne '\nalias kxd="source _kxd"' >> ~/.zshrc`
+**bash** (`~/.bashrc` or `~/.bash_profile`):
+```sh
+eval "$(kxd init bash)"
+```
+
+**fish** (`~/.config/fish/config.fish`):
+```fish
+kxd init fish | source
+```
+
+**PowerShell** (`$PROFILE`):
+```powershell
+kxd init powershell | Out-String | Invoke-Expression
+```
+
+Ex. `echo 'eval "$(kxd init zsh)"' >> ~/.zshrc`
+
+That one line defines the `kxd` shell function, sets up tab completion, and applies the kubeconfig
+you last selected to every new shell. Nothing else to configure.
 
 ### Upgrading
 Upgrading consists of just doing a brew update and brew upgrade.
@@ -72,63 +99,82 @@ Upgrading consists of just doing a brew update and brew upgrade.
 brew update && brew upgrade radiusmethod/kxd/kxd
 ```
 
+### Upgrading from pre-v0.2.0
+**v0.2.0 is a breaking change.** kxd now installs one binary named `kxd`. The old `_kxd_prompt`
+binary, the `_kxd` wrapper script, `_kxd_autocomplete`, and both `.ps1` wrappers are gone, along
+with the alias-based setup.
+
+The single `eval` line above replaces all of this, so delete whatever you have of it:
+
+```sh
+alias kxd="source _kxd"              # removed in v0.2.0
+source _kxd_autocomplete             # removed in v0.2.0
+export KUBECONFIG=$(kxd file current) # no longer needed, init applies it
+```
+
+Keep your `KXD_MATCHER` line if you set one. Then clear out the old files, which a package manager
+will not remove for you if you ever ran `make install` by hand:
+
+```sh
+rm -f /usr/local/bin/_kxd_prompt /usr/local/bin/_kxd /usr/local/bin/_kxd_autocomplete
+type -a _kxd_prompt   # should print nothing
+```
+
+Two things that bite during the upgrade:
+
+- **Remove the old alias.** In zsh an alias shadows a function of the same name, so leaving
+  `alias kxd="source _kxd"` in place means the new `kxd` function never gets used. If the alias is
+  defined *before* the `eval` line, the eval fails outright with
+  `defining function based on alias 'kxd'`.
+- **Put the `eval` line after any `PATH` changes** that point at your kxd install, and after
+  `KXD_MATCHER` is exported. It runs `kxd` at startup, so an older copy earlier in `PATH` at that
+  moment produces confusing errors. `type -a kxd` shows you every copy.
+
+Your `~/.kxd` file carries over untouched, so your selected kubeconfig survives the upgrade.
+
 ### Windows
 
-`kxd` is designed for POSIX shells (bash/zsh): the Go binary writes the user's selection to `~/.kxd`, then a wrapper script that you `source` reads that file and exports `KUBECONFIG` into your current shell. A child process can't mutate its parent's environment, so the wrapper indirection is mandatory — and that's what makes Windows non-trivial. Three paths work:
-
-#### WSL (recommended)
-
-From a WSL2 Ubuntu/Debian shell, follow the standard Linux instructions exactly: `make install`, then add `alias kxd="source _kxd"` to `~/.bashrc` or `~/.zshrc`. From WSL's perspective it's just Linux.
-
-Caveat: the `KUBECONFIG` you set inside WSL is **not** visible to `kubectl.exe` invoked from PowerShell or `cmd`. Run `kubectl` from WSL too, or set the env var separately on the Windows side.
-
-#### Git Bash / MSYS2
-
-The Go binary cross-compiles cleanly and the bash wrapper is portable enough for Git Bash to `source`. Manual setup:
-
-1. Build the Windows binary:
-   ```sh
-   GOOS=windows GOARCH=amd64 go build -o _kxd_prompt.exe .
-   ```
-2. Copy `_kxd_prompt.exe`, `scripts/_kxd`, and `scripts/_kxd_autocomplete` to a directory on your Git Bash `PATH` (e.g. `~/bin`).
-3. Add to `~/.bashrc`:
-   ```sh
-   alias kxd="source _kxd"
-   source _kxd_autocomplete
-   ```
-4. Make sure `~/.kube/` exists with your config files. In Git Bash, `~` resolves to `C:\Users\<you>`.
-
-Untested by the maintainers. `~/.kube/config` symlinks created on the Windows side sometimes confuse path resolution.
+Releases include Windows binaries for amd64 and arm64, and `kxd init powershell` generates the
+PowerShell integration, so there is nothing to copy by hand.
 
 #### Native PowerShell
 
-`scripts/_kxd.ps1` and `scripts/_kxd_autocomplete.ps1` are PowerShell equivalents of the bash wrapper and autocomplete.
-
-If you have `make` available on Windows, `Makefile_Windows` collapses steps 1–2 below into a single command:
+Download the Windows archive from the
+[latest release](https://github.com/radiusmethod/kxd/releases/latest), put `kxd.exe` on your
+`$env:PATH`, then add this to your profile (open it with `notepad $PROFILE`):
 
 ```powershell
-make -f Makefile_Windows SHELL=pwsh.exe install
+kxd init powershell | Out-String | Invoke-Expression
 ```
 
-That builds `_kxd_prompt.exe` and drops both `.ps1` files into `C:\tools\kxd\` (override with `BINDIR=...`). You still need to add that directory to `$env:PATH` and dot-source the scripts from your `$PROFILE` (step 3 below).
+Restart PowerShell. `kxd` is now a function in your session, with tab completion, and your
+selected kubeconfig is applied to every new session.
 
-Otherwise, manual setup:
+Building from source instead needs [Go](https://golang.org/dl/):
 
-1. Build the Windows binary and put it somewhere on `$env:PATH`:
-   ```powershell
-   $env:GOOS = "windows"; $env:GOARCH = "amd64"
-   go build -o _kxd_prompt.exe .
-   # move _kxd_prompt.exe into e.g. C:\Users\<you>\bin
-   ```
-2. Copy `scripts/_kxd.ps1` and `scripts/_kxd_autocomplete.ps1` somewhere persistent (e.g. `C:\Users\<you>\bin`).
-3. Dot-source both from your PowerShell profile (open it with `notepad $PROFILE`):
-   ```powershell
-   . "$HOME\bin\_kxd.ps1"
-   . "$HOME\bin\_kxd_autocomplete.ps1"
-   ```
-4. Restart PowerShell. `kxd` is now a function in your session.
+```powershell
+make -f Makefile_Windows install    # builds kxd.exe into C:\tools\kxd, override with BINDIR=...
+```
 
-The function reads/writes `$HOME\.kxd` and `$HOME\.kube\<name>` — same layout as the POSIX version, so configs interoperate with WSL or Git Bash on the same machine if you point them at the same `.kube` directory.
+#### WSL
+
+From a WSL2 Ubuntu/Debian shell, follow the standard Linux instructions exactly. From WSL's
+perspective it's just Linux.
+
+Caveat: the `KUBECONFIG` you set inside WSL is **not** visible to `kubectl.exe` invoked from
+PowerShell or `cmd`. Run `kubectl` from WSL too, or set the env var separately on the Windows side.
+
+#### Git Bash / MSYS2
+
+Put `kxd.exe` on your Git Bash `PATH` and add `eval "$(kxd init bash)"` to `~/.bashrc`. Make sure
+`~/.kube/` exists with your config files; in Git Bash, `~` resolves to `C:\Users\<you>`.
+
+Untested by the maintainers. `~/.kube/config` symlinks created on the Windows side sometimes
+confuse path resolution.
+
+kxd reads and writes `$HOME\.kxd` and `$HOME\.kube\<name>` on every platform, so configs
+interoperate between PowerShell, WSL, and Git Bash on the same machine if you point them at the
+same `.kube` directory.
 
 ## Configuration
 
@@ -209,12 +255,8 @@ To check the version of Kubeconfig Switcher, use the following command:
 kxd version
 ```
 
-## Persist KUBECONFIG across new shells
-To persist the set config when you open new terminal windows, you can add the following to your bash profile or zshrc.
-
-```bash
-export KUBECONFIG=$(kxd file current)
-```
+Your selection persists across new terminal windows automatically, since `kxd init` applies
+whatever is in `~/.kxd` when each shell starts.
 
 ### Show your set kubeconfig in your shell prompt
 For better visibility into what your shell is set to it can be helpful to configure your prompt to show the value of the env variable `KUBECONFIG`.
@@ -273,17 +315,39 @@ Then add `kxd` to either your left or right prompt segments.
 <img src="assets/ohmyzsh-screenshot.png" width="700">
 
 ## Add autocompletion
-You can add autocompletion when passing config as argument by adding the following to your bash profile or zshrc file.
-`source _kxd_autocomplete`
+Tab completion comes with `kxd init`. Type `kxd my-k`, hit tab, and a config named
+`my-kubeconfig.conf` completes. It also completes the `file`/`context`/`namespace` subcommands and
+their `switch`/`current`/`list` arguments, so `kxd file switch <TAB>` lists your configs and
+`kxd context switch <TAB>` lists contexts.
 
-Now you can do `kxd my-k` and hit tab and if you had a config `my-kubeconfig` it would autocomplete and find it.
+Namespaces are deliberately not completed: `kxd namespace list` queries the live cluster, and
+blocking your shell on a network round trip every time you press tab is worse than no completion.
 
-## TL;DR (full config example)
+## Why a shell function?
+
+`kxd init` generates a shell function rather than shipping a plain binary, because a child process
+cannot change its parent shell's environment. Anything that sets `KUBECONFIG` for your current
+shell has to run *in* that shell.
+
+So the binary does the picking and writes your choice to `~/.kxd`, and the generated function asks
+it for the matching shell code and evals that:
+
 ```sh
-alias kxd="source _kxd"
-source _kxd_autocomplete
-export KXD_MATCHER="-config,.conf"
-export KUBECONFIG=$(kxd file current)
+kxd() {
+  command kxd "$@" || return
+  eval "$(command kxd shellenv bash)"
+}
+```
+
+The function and the binary share the name `kxd`. That works because `command` skips functions and
+aliases and runs the executable from `PATH`. PowerShell's `&` operator does not do this, so the
+generated PowerShell integration resolves the binary path up front with `Get-Command` instead.
+
+You can see exactly what gets eval'd at any time:
+
+```sh
+kxd init zsh      # the whole integration
+kxd shellenv zsh  # just the export for the current selection
 ```
 
 ## Contributing

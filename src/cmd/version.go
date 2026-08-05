@@ -5,7 +5,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var version string = "v0.1.4"
+// version is injected at build time via ldflags:
+//
+//	-X github.com/radiusmethod/kxd/src/cmd.version=v1.2.3
+//
+// GoReleaser sets it from the git tag, and `make install` sets it from
+// `git describe`. Plain `go build` leaves it as "dev".
+var version = "dev"
 
 var versionCmd = &cobra.Command{
 	Use:     "version",
