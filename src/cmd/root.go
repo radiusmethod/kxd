@@ -1,12 +1,19 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
-	"github.com/radiusmethod/kxd/src/utils"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
+
+	"github.com/radiusmethod/kxd/src/utils"
+	"github.com/spf13/cobra"
 )
+
+// errConfigNotFound is returned when argv named a kubeconfig that isn't in
+// ~/.kube. The generated shell function keys off the exit code, so this has to
+// fail rather than exit 0.
+var errConfigNotFound = errors.New("config does not exist")
 
 var rootCmd = &cobra.Command{
 	Use:   "kxd",
@@ -28,9 +35,7 @@ func RootCmd() *cobra.Command {
 func Execute() {
 	if shouldRunDirectConfigSwitch() {
 		config := os.Args[1]
-		if err := directConfigSwitch(config); err != nil {
-			log.Fatal(err)
-		}
+		handleSwitchError(directConfigSwitch(config))
 		return
 	}
 	runRootCmd()
@@ -49,11 +54,26 @@ func directConfigSwitch(desiredConfig string) error {
 		return nil
 	}
 
-	fmt.Printf(utils.NoticeColor, "WARNING: Config ")
-	fmt.Printf(utils.CyanColor, desiredConfig)
-	fmt.Printf(utils.NoticeColor, " does not exist or is invalid.\n")
+	// stderr, not stdout: the shell integration evals command substitutions of
+	// this binary, so a warning on stdout would be executed instead of shown.
+	fmt.Fprintf(os.Stderr, utils.NoticeColor, "WARNING: Config ")
+	fmt.Fprintf(os.Stderr, utils.CyanColor, desiredConfig)
+	fmt.Fprintf(os.Stderr, utils.NoticeColor, " does not exist or is invalid.\n")
 
-	return nil
+	return fmt.Errorf("%w: %s", errConfigNotFound, desiredConfig)
+}
+
+// handleSwitchError exits non-zero when a config switch fails. A missing config
+// has already been reported on stderr, so exit quietly instead of printing it a
+// second time through log.Fatal.
+func handleSwitchError(err error) {
+	if err == nil {
+		return
+	}
+	if errors.Is(err, errConfigNotFound) {
+		os.Exit(1)
+	}
+	log.Fatal(err)
 }
 
 func runRootCmd() {
@@ -63,6 +83,8 @@ func runRootCmd() {
 }
 
 func shouldRunDirectConfigSwitch() bool {
-	invalidConfigs := []string{"f", "file", "ctx", "context", "ns", "namespace", "completion", "help", "--help", "v", "version"}
+	// Any argv[1] not in this list is treated as a kubeconfig name, so every
+	// subcommand and alias has to be listed here.
+	invalidConfigs := []string{"f", "file", "ctx", "context", "ns", "namespace", "init", "shellenv", "completion", "help", "--help", "v", "version"}
 	return len(os.Args) > 1 && !utils.Contains(invalidConfigs, os.Args[1])
 }

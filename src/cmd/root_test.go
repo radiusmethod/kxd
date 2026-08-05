@@ -52,15 +52,18 @@ func TestDirectConfigSwitch(t *testing.T) {
 	}
 
 	tests := []struct {
-		name         string
-		desired      string
-		expectFile   bool
-		expectedKxd  string
+		name        string
+		desired     string
+		expectFile  bool
+		expectedKxd string
+		expectError bool
 	}{
-		{"valid config", "dev.conf", true, "dev.conf"},
+		{"valid config", "dev.conf", true, "dev.conf", false},
 		// "default" is rewritten to "config" before being persisted.
-		{"default sentinel rewrites to config", "default", true, "config"},
-		{"invalid config leaves .kxd untouched", "nope.conf", false, ""},
+		{"default sentinel rewrites to config", "default", true, "config", false},
+		// An unknown config must fail rather than exit 0: the generated shell
+		// function keys off the exit code before applying any new state.
+		{"invalid config leaves .kxd untouched", "nope.conf", false, "", true},
 	}
 
 	for _, tt := range tests {
@@ -69,7 +72,11 @@ func TestDirectConfigSwitch(t *testing.T) {
 			_ = os.Remove(kxdFile)
 
 			err := directConfigSwitch(tt.desired)
-			assert.NoError(t, err)
+			if tt.expectError {
+				assert.ErrorIs(t, err, errConfigNotFound)
+			} else {
+				assert.NoError(t, err)
+			}
 
 			if tt.expectFile {
 				content, err := os.ReadFile(kxdFile)

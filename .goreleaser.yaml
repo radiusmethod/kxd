@@ -1,0 +1,96 @@
+version: 2
+
+project_name: kxd
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: kxd
+    binary: kxd
+    main: .
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      # version is otherwise "dev"; the tag is the source of truth for releases.
+      - -s -w -X github.com/radiusmethod/kxd/src/cmd.version=v{{ .Version }}
+
+archives:
+  - id: kxd
+    ids:
+      - kxd
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+      - CHANGELOG.md
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  # Release notes come from CHANGELOG.md via --release-notes in the workflow.
+  disable: true
+
+release:
+  prerelease: auto
+  # Make re-runs idempotent. Without this, retrying a tag after a partial
+  # failure (a bad tap token, say) trips over the release that already exists.
+  mode: replace
+
+homebrew_casks:
+  - name: kxd
+    ids:
+      - kxd
+    repository:
+      owner: radiusmethod
+      name: homebrew-kxd
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Casks
+    homepage: "https://github.com/radiusmethod/kxd"
+    description: "Kubeconfig and context switcher in Go"
+    license: "MIT"
+    # Ship binaries even when the tap token is not configured, rather than
+    # failing the whole release. The workflow always defines the variable, so
+    # this is empty rather than missing when the secret is absent.
+    skip_upload: '{{ if .Env.HOMEBREW_TAP_GITHUB_TOKEN }}false{{ else }}true{{ end }}'
+    hooks:
+      post:
+        # The binaries are unsigned, so macOS quarantines them on download and
+        # Gatekeeper refuses to run them. Strip the attribute on install.
+        install: |
+          if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/kxd"]
+          end
+    caveats: |
+      To finish setting up kxd, add the line for your shell to its startup file:
+
+        zsh          eval "$(kxd init zsh)"
+        bash         eval "$(kxd init bash)"
+        fish         kxd init fish | source
+        PowerShell   kxd init powershell | Out-String | Invoke-Expression
+
+      Then open a new terminal, or source that file.
+
+      Upgrading from before v0.2.0? The line above replaces all of these, so
+      remove them from your shell config:
+
+        alias kxd="source _kxd"
+        source _kxd_autocomplete
+        export KUBECONFIG=$(kxd file current)
+
+      Then delete any leftover _kxd_prompt, _kxd, and _kxd_autocomplete files
+      from earlier manual installs.
